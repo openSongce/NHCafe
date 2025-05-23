@@ -17,6 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.ssafy.nhcafe.ui.ConversationScreen
 import com.ssafy.nhcafe.ui.MainScreen
 import com.ssafy.nhcafe.ui.OrderConfirmScreen
+import com.ssafy.nhcafe.ui.PhoneNumberInputScreen
 import com.ssafy.nhcafe.ui.SplashScreen
 import com.ssafy.nhcafe.ui.theme.NHCafeTheme
 
@@ -51,6 +52,14 @@ class MainActivity : ComponentActivity() {
                         onLanguageToggle = { isKorean = !isKorean }
                     )
                 }
+                composable("phoneNumberInput") {
+                    PhoneNumberInputScreen(
+                        isKorean = isKorean,                // 현재 언어 상태
+                        onLanguageToggle = { isKorean = !isKorean },  // 언어 토글
+                        navController = navController, // 닫기 버튼 (뒤로가기)
+                    )
+                }
+
             }
         }
     }

@@ -119,7 +119,7 @@ fun OrderConfirmScreen(
         ) {
             // 🔹 취소 버튼 (비율 고정)
             Button(
-                onClick = { /* 취소 동작 */ },
+                onClick = { navController.popBackStack() },
                 shape = RoundedCornerShape(30.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCEBDD)),
                 elevation = ButtonDefaults.buttonElevation(6.dp),
@@ -137,7 +137,7 @@ fun OrderConfirmScreen(
 
             // 🔸 주문 버튼 (강조 색상, 아이콘 포함)
             Button(
-                onClick = { /* 주문 동작 */ },
+                onClick = { navController.navigate("phoneNumberInput") },
                 shape = RoundedCornerShape(30.dp),
                 elevation = ButtonDefaults.buttonElevation(8.dp),
                 colors = ButtonDefaults.buttonColors(
