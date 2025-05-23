@@ -9,64 +9,38 @@ import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.ssafy.nhcafe.R
+import com.ssafy.nhcafe.ui.common.TopBar
 
 @Composable
-fun MainScreen() {
-    var isKorean by remember { mutableStateOf(true) }
-
+fun MainScreen(
+    navController: NavController,
+    isKorean: Boolean,
+    onLanguageToggle: () -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFFEF5ED))
             .padding(horizontal = 20.dp)
     ) {
-        TopBarSection(isKorean) { isKorean = !isKorean }
+        TopBar(isKorean, onLanguageToggle)
         Spacer(modifier = Modifier.height(12.dp))
         GreetingCard(isKorean)
         Spacer(modifier = Modifier.height(20.dp))
         RecommendedMenuSection(isKorean)
         Spacer(modifier = Modifier.weight(1f))
-        VoiceInputSection(isKorean)
-    }
-}
-
-@Composable
-fun TopBarSection(isKorean: Boolean, onLanguageToggle: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 16.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(id = R.drawable.logo_splash),
-                contentDescription = "NHCafe Logo",
-                modifier = Modifier.size(50.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = if (isKorean) "NHCafe - 인동점" else "NHCafe - Indong Branch",
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                color = Color(0xFF5D2C15)
-            )
-        }
-
-
-        TextButton(onClick = onLanguageToggle) {
-            Text(
-                text = if (isKorean) "🇰🇷" else "🇺🇸",
-                fontSize = 20.sp
-            )
-        }
+        VoiceInputSection(
+            isKorean = isKorean,
+            onSpeakClick = { navController.navigate("conversation") }
+        )
     }
 }
 
@@ -75,9 +49,16 @@ fun GreetingCard(isKorean: Boolean) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
+            .shadow(
+                elevation = 6.dp,
+                shape = RoundedCornerShape(12.dp),
+                ambientColor = Color(0x33000000), // 부드러운 회색 그림자
+                spotColor = Color(0x55000000)     // 그림자 강조 색
+            )
             .background(Color(0xFFFCEBDD), shape = RoundedCornerShape(12.dp))
             .padding(16.dp)
-    ) {
+    )
+    {
         Text(
             text = if (isKorean)
                 "오늘 하루도 따뜻하게, 좋은 하루 보내세요 :)"
@@ -127,6 +108,7 @@ fun MenuCard(imageRes: Int, title: String, subtitle: String) {
     Column(
         modifier = Modifier
             .width(100.dp)
+            .shadow(6.dp, shape = RoundedCornerShape(12.dp))
             .background(Color.White, shape = RoundedCornerShape(12.dp))
             .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -134,28 +116,32 @@ fun MenuCard(imageRes: Int, title: String, subtitle: String) {
         Image(
             painter = painterResource(id = imageRes),
             contentDescription = title,
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(48.dp).shadow(4.dp, shape = CircleShape)
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(title, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Text(title, fontWeight = FontWeight.Bold, fontSize = 13.sp)
         Text(subtitle, fontSize = 12.sp, color = Color.Gray)
     }
 }
 
 @Composable
-fun VoiceInputSection(isKorean: Boolean) {
+fun VoiceInputSection(isKorean: Boolean,  onSpeakClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxWidth()
     ) {
         Button(
-            onClick = { /* TODO: 음성 인식 로직 */ },
+            onClick = onSpeakClick,
             shape = CircleShape,
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 8.dp,
+                pressedElevation = 12.dp
+            ),
             colors = ButtonDefaults.buttonColors(
                 containerColor = Color(0xFFDFA878),
                 contentColor = Color.White
             ),
-            modifier = Modifier.size(90.dp)
+            modifier = Modifier.size(100.dp)
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -192,5 +178,6 @@ fun VoiceInputSection(isKorean: Boolean) {
         )
     }
 }
+
 
 
