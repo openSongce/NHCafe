@@ -2,6 +2,7 @@ package com.ssafy.nhcafe.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,6 +37,8 @@ fun MainScreen(
         GreetingCard(isKorean)
         Spacer(modifier = Modifier.height(20.dp))
         RecommendedMenuSection(isKorean)
+        Spacer(modifier = Modifier.weight(1f))
+        MenuSection(isKorean, moreClick = { navController.navigate("menu")})
         Spacer(modifier = Modifier.weight(1f))
         VoiceInputSection(
             isKorean = isKorean,
@@ -83,10 +86,41 @@ fun RecommendedMenuSection(isKorean: Boolean) {
                 fontSize = 18.sp,
                 color = Color(0xFF5D2C15)
             )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            MenuCard(R.drawable.temp_latte, if (isKorean) "카페라떼" else "Café Latte", if (isKorean) "부드러운 라떼" else "Smooth Latte")
+            MenuCard(R.drawable.temp_americano, if (isKorean) "아메리카노" else "Americano", if (isKorean) "진한 커피향" else "Deep Coffee")
+            MenuCard(R.drawable.temp_cappuccino, if (isKorean) "카푸치노" else "Cappuccino", if (isKorean) "풍부한 거품" else "Rich Foam")
+        }
+    }
+}
+
+@Composable
+fun MenuSection(isKorean: Boolean, moreClick : () -> Unit) {
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = if (isKorean) "매장 메뉴" else "Menu",
+                fontWeight = FontWeight.Bold,
+                fontSize = 18.sp,
+                color = Color(0xFF5D2C15)
+            )
             Text(
                 text = if (isKorean) "더보기" else "More",
                 color = Color.Gray,
-                fontSize = 14.sp
+                fontSize = 14.sp,
+                modifier = Modifier.clickable {
+                    moreClick()
+                }
             )
         }
 

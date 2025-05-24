@@ -14,11 +14,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.ssafy.nhcafe.ui.CompleteOrderScreen
 import com.ssafy.nhcafe.ui.ConversationScreen
 import com.ssafy.nhcafe.ui.MainScreen
+import com.ssafy.nhcafe.ui.MenuScreen
 import com.ssafy.nhcafe.ui.OrderConfirmScreen
 import com.ssafy.nhcafe.ui.PhoneNumberInputScreen
 import com.ssafy.nhcafe.ui.SplashScreen
+import com.ssafy.nhcafe.ui.StampScreen
 import com.ssafy.nhcafe.ui.theme.NHCafeTheme
 
 class MainActivity : ComponentActivity() {
@@ -59,25 +62,35 @@ class MainActivity : ComponentActivity() {
                         navController = navController, // 닫기 버튼 (뒤로가기)
                     )
                 }
+                composable("stamp/{phoneNumber}") { backStackEntry ->
+                    val phoneNumber = backStackEntry.arguments?.getString("phoneNumber") ?: ""
+                    StampScreen(
+                        navController = navController,
+                        isKorean = isKorean,
+                        onLanguageToggle = { isKorean = !isKorean },
+                        phoneNumber = phoneNumber
+                    )
+                }
+                composable("completeOrder/{orderNumber}") { backStackEntry ->
+                    val orderNumber = backStackEntry.arguments?.getString("orderNumber")?.toIntOrNull() ?: 0
+                    CompleteOrderScreen(
+                        navController = navController,
+                        isKorean = isKorean,
+                        onLanguageToggle = { isKorean = !isKorean },
+                        orderNumber = orderNumber
+                    )
+                }
+                composable("menu") {
+                    MenuScreen(
+                        navController = navController,
+                        isKorean = isKorean,
+                        onLanguageToggle = { isKorean = !isKorean }
+                    )
+                }
+
+
 
             }
         }
-    }
-}
-
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    NHCafeTheme {
-        Greeting("Android")
     }
 }
