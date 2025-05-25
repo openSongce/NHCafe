@@ -53,8 +53,6 @@ import com.ssafy.nhcafe.viewModel.GPTViewModel
 import com.ssafy.nhcafe.viewModel.SpeechViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.animation.core.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.draw.scale
 
 
 @Composable

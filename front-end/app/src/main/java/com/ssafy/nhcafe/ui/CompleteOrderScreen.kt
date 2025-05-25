@@ -2,7 +2,6 @@ package com.ssafy.nhcafe.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,21 +15,22 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ssafy.nhcafe.R
 import com.ssafy.nhcafe.ui.common.TopBar
+import com.ssafy.nhcafe.viewModel.GPTViewModel
 
 @Composable
 fun CompleteOrderScreen(
@@ -39,6 +39,14 @@ fun CompleteOrderScreen(
     onLanguageToggle: () -> Unit,
     orderNumber: Int = 123 // 기본값 예시
 ) {
+    val gptViewModel: GPTViewModel = viewModel()
+    val apiKey = "sREDACTED_PROJECT_KEY"
+
+    LaunchedEffect(Unit) {
+        val message = if (isKorean) "주문이 완료되었습니다. 주문번호는 $orderNumber 번입니다." else "Order completed. Your order number is $orderNumber."
+        gptViewModel.playTTS(message, apiKey)
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
