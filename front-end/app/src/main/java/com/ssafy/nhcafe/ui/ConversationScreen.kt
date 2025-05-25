@@ -1,5 +1,10 @@
 package com.ssafy.nhcafe.ui
 
+import android.app.Application
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -29,7 +35,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -37,23 +42,39 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ssafy.nhcafe.R
 import com.ssafy.nhcafe.ui.common.TopBar
-import kotlinx.coroutines.delay
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ssafy.nhcafe.viewModel.GPTViewModel
+import com.ssafy.nhcafe.viewModel.SpeechViewModel
+import kotlinx.coroutines.launch
+import androidx.compose.animation.core.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.draw.scale
+
 
 @Composable
 fun ConversationScreen(navController: NavController,
                        isKorean: Boolean,
                        onLanguageToggle: () -> Unit) {
-    var isListening by remember { mutableStateOf(false) }
-
-
-    val messages = listOf(
-        Message("아이스 아메리카노 한 잔이요.", true),
-        Message("아이스 아메리카노 한 잔, 맞으실까요?", false),
-        Message("따뜻한 카페라떼 두 잔이요.", true),
-        Message("카페라떼 두 잔 추가하겠습니다. 맞으실까요?", false),
-        Message("네, 맞아요.", true),
-        Message("추가로 원하시는 게 있으신가요?", false)
+    var messages by remember { mutableStateOf(listOf<Message>()) }
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val gptViewModel: GPTViewModel = viewModel()
+    val gptResponse by gptViewModel.chatResponse.collectAsState()
+    val speechViewModel: SpeechViewModel = viewModel(
+        factory = ViewModelProvider.AndroidViewModelFactory(context.applicationContext as Application)
     )
+    val recognizedText by speechViewModel.recognizedText.collectAsState()
+    val isListening by speechViewModel.isListening.collectAsState()
+    val apiKey = "sREDACTED_PROJECT_KEY"
+
+
 
     Column(
         modifier = Modifier
@@ -84,7 +105,8 @@ fun ConversationScreen(navController: NavController,
             modifier = Modifier
                 .weight(1f)
                 .padding(horizontal = 12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            state = listState
         ) {
             items(messages.size) { index ->
                 ChatBubble(messages[index])
@@ -99,18 +121,47 @@ fun ConversationScreen(navController: NavController,
         }
 
 
-        BottomButtonBar(isListening = isListening,
-            onMicClick = { isListening = true}, onOrderClick = {
+        BottomButtonBar(
+            onMicClick = {
+                gptViewModel.stopTTS()
+                speechViewModel.startListening()
+             },
+            onOrderClick = {
+                gptViewModel.stopTTS()
                 navController.navigate("orderConfirm")
-            })
+            }
+        )
     }
 
-    LaunchedEffect(isListening) {
-        if (isListening) {
-            delay(3000L)
-            isListening = false
+    LaunchedEffect(messages.size, isListening) {
+        listState.animateScrollToItem(messages.size)
+    }
+
+
+    LaunchedEffect(recognizedText) {
+        if (recognizedText.isNotBlank()) {
+            messages = messages + Message(recognizedText, isUser = true)
+            gptViewModel.sendMessageToGPT(recognizedText, apiKey)
         }
     }
+
+    LaunchedEffect(gptResponse) {
+        if (gptResponse.isNotEmpty() && gptResponse != "GPT 응답을 기다리는 중...") {
+            messages = messages + Message(gptResponse, isUser = false)
+            gptViewModel.playTTS(gptResponse, apiKey)
+            gptViewModel.clearChatResponse()
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            speechViewModel.clearRecognizedText()
+            gptViewModel.clearChatResponse()  // GPT 응답 초기화
+            messages = listOf()               // 메시지 버블 초기화
+            gptViewModel.stopTTS()            // TTS 재생 중지
+        }
+    }
+
 
 }
 
@@ -141,12 +192,6 @@ fun ChatBubble(message: Message) {
             modifier = Modifier
                 .background(backgroundColor, shape = RoundedCornerShape(12.dp))
                 .padding(12.dp)
-                .shadow(
-                    elevation = 6.dp,
-                    shape = RoundedCornerShape(12.dp),
-                    ambientColor = Color(0x33000000), // 부드러운 회색 그림자
-                    spotColor = Color(0x55000000)     // 그림자 강조 색
-                )
                 .widthIn(max = 280.dp)
         ) {
             Text(message.text, fontSize = 14.sp)
@@ -165,8 +210,7 @@ fun ChatBubble(message: Message) {
 
 
 @Composable
-fun BottomButtonBar(isListening: Boolean,
-                    onMicClick: () -> Unit, onOrderClick: () -> Unit) {
+fun BottomButtonBar(onMicClick: () -> Unit, onOrderClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -228,6 +272,17 @@ fun BottomButtonBar(isListening: Boolean,
 
 @Composable
 fun ListeningIndicator() {
+    val infiniteTransition = rememberInfiniteTransition()
+
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -235,14 +290,13 @@ fun ListeningIndicator() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = R.drawable.listening_icon), // 이미지 파일 이름
+            painter = painterResource(id = R.drawable.listening_icon),
             contentDescription = "듣는 중",
-            modifier = Modifier.size(180.dp).clip(CircleShape)
+            modifier = Modifier
+                .size(180.dp)
+                .graphicsLayer(scaleX = scale, scaleY = scale)
+                .clip(CircleShape)
         )
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
-
-
-
-

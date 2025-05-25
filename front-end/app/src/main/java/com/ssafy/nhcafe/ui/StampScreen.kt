@@ -90,7 +90,9 @@ fun StampScreen(
         Button(
             onClick = {
                 // TODO: 할인 적용 후 다음 화면으로 이동
-                navController.navigate("completeOrder/{orderNumber}") // 예시
+                navController.navigate("completeOrder/{orderNumber}"){
+                    popUpTo("main"){inclusive=false}
+                }  // 예시
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF7C3C)),
             shape = RoundedCornerShape(30.dp),
@@ -112,7 +114,9 @@ fun StampScreen(
         // 건너뛰기 버튼
         Button(
             onClick = {
-                navController.navigate("completeOrder/{orderNumber}") // 스킵 시에도 다음 화면
+                navController.navigate("completeOrder/{orderNumber}"){
+                    popUpTo("main"){inclusive=false}
+                }  // 스킵 시에도 다음 화면
             },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFDE4D1)),
             shape = RoundedCornerShape(30.dp),

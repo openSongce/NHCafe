@@ -97,7 +97,9 @@ fun CompleteOrderScreen(
         Spacer(modifier = Modifier.height(40.dp))
 
         Button(
-            onClick = { navController.navigate("main") },
+            onClick = { navController.navigate("conversation"){
+                popUpTo("main"){inclusive=false}
+            }  },
             shape = RoundedCornerShape(30.dp),
             modifier = Modifier
                 .fillMaxWidth()
@@ -116,7 +118,9 @@ fun CompleteOrderScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         Button(
-            onClick = { navController.navigate("main") },
+            onClick = { navController.navigate("main"){
+                popUpTo("main"){inclusive=true}
+            } },
             shape = RoundedCornerShape(30.dp),
             modifier = Modifier
                 .fillMaxWidth()
