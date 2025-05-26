@@ -7,18 +7,24 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
-import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ssafy.nhcafe.R
+import com.ssafy.nhcafe.api.RecommendedMenu
 import com.ssafy.nhcafe.ui.common.TopBar
+import com.ssafy.nhcafe.viewModel.GPTViewModel
+
+
+
 
 @Composable
 fun MainScreen(
@@ -26,6 +32,12 @@ fun MainScreen(
     isKorean: Boolean,
     onLanguageToggle: () -> Unit
 ) {
+
+    val gptViewModel: GPTViewModel = viewModel()
+    val recommendedMenus by gptViewModel.recommendedMenus.collectAsState()
+    val apiKey = "sREDACTED_PROJECT_KEY"
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -36,7 +48,7 @@ fun MainScreen(
         Spacer(modifier = Modifier.height(12.dp))
         GreetingCard(isKorean)
         Spacer(modifier = Modifier.height(20.dp))
-        RecommendedMenuSection(isKorean)
+        RecommendedMenuSection(isKorean = isKorean, menus = recommendedMenus)
         Spacer(modifier = Modifier.weight(1f))
         MenuSection(isKorean, moreClick = { navController.navigate("menu")})
         Spacer(modifier = Modifier.weight(1f))
@@ -45,6 +57,12 @@ fun MainScreen(
             onSpeakClick = { navController.navigate("conversation") }
         )
     }
+
+
+    LaunchedEffect(isKorean) {
+        gptViewModel.fetchRecommendedMenus(apiKey, isKorean)
+    }
+
 }
 
 @Composable
@@ -74,32 +92,34 @@ fun GreetingCard(isKorean: Boolean) {
 }
 
 @Composable
-fun RecommendedMenuSection(isKorean: Boolean) {
+fun RecommendedMenuSection(isKorean: Boolean, menus: List<RecommendedMenu>) {
     Column {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = if (isKorean) "추천 메뉴" else "Recommended Menu",
-                fontWeight = FontWeight.Bold,
-                fontSize = 18.sp,
-                color = Color(0xFF5D2C15)
-            )
-        }
-
+        Text(
+            text = if (isKorean) "추천 메뉴" else "Recommended Menu",
+            fontWeight = FontWeight.Bold,
+            fontSize = 18.sp,
+            color = Color(0xFF5D2C15)
+        )
         Spacer(modifier = Modifier.height(12.dp))
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            MenuCard(R.drawable.temp_latte, if (isKorean) "카페라떼" else "Café Latte", if (isKorean) "부드러운 라떼" else "Smooth Latte")
-            MenuCard(R.drawable.temp_americano, if (isKorean) "아메리카노" else "Americano", if (isKorean) "진한 커피향" else "Deep Coffee")
-            MenuCard(R.drawable.temp_cappuccino, if (isKorean) "카푸치노" else "Cappuccino", if (isKorean) "풍부한 거품" else "Rich Foam")
+            menus.forEach { menu ->
+                val imageRes = when (menu.image) {
+                    "latte" -> R.drawable.temp_latte
+                    "americano" -> R.drawable.temp_americano
+                    "cappuccino" -> R.drawable.temp_cappuccino
+                    else -> R.drawable.temp_latte
+                }
+                MenuCard(imageRes, menu.name, menu.description)
+            }
         }
     }
 }
+
+
 
 @Composable
 fun MenuSection(isKorean: Boolean, moreClick : () -> Unit) {
@@ -153,8 +173,22 @@ fun MenuCard(imageRes: Int, title: String, subtitle: String) {
             modifier = Modifier.size(48.dp).shadow(4.dp, shape = CircleShape)
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(title, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-        Text(subtitle, fontSize = 12.sp, color = Color.Gray)
+        Text(
+            text = title,
+            fontWeight = FontWeight.Bold,
+            fontSize = 13.sp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis // 긴 제목 말줄임표
+        )
+
+        Text(
+            text = subtitle,
+            fontSize = 12.sp,
+            color = Color.Gray,
+            maxLines = 2, // 설명은 2줄까지
+            overflow = TextOverflow.Ellipsis
+        )
+
     }
 }
 

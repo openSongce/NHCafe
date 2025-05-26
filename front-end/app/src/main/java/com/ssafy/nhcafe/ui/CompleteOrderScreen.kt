@@ -17,6 +17,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +46,12 @@ fun CompleteOrderScreen(
     LaunchedEffect(Unit) {
         val message = if (isKorean) "주문이 완료되었습니다. 주문번호는 $orderNumber 번입니다." else "Order completed. Your order number is $orderNumber."
         gptViewModel.playTTS(message, apiKey)
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            gptViewModel.stopTTS()            // TTS 재생 중지
+        }
     }
 
     Column(

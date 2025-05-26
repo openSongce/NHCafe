@@ -120,6 +120,7 @@ fun ConversationScreen(navController: NavController,
 
 
         BottomButtonBar(
+            isKorean,
             onMicClick = {
                 gptViewModel.stopTTS()
                 speechViewModel.startListening()
@@ -208,7 +209,7 @@ fun ChatBubble(message: Message) {
 
 
 @Composable
-fun BottomButtonBar(onMicClick: () -> Unit, onOrderClick: () -> Unit) {
+fun BottomButtonBar(isKorean: Boolean, onMicClick: () -> Unit, onOrderClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -235,7 +236,7 @@ fun BottomButtonBar(onMicClick: () -> Unit, onOrderClick: () -> Unit) {
                 modifier = Modifier.size(40.dp)
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("말하기")
+            Text(text = if (isKorean) "말하기" else "Speak")
         }
 
 
@@ -263,7 +264,7 @@ fun BottomButtonBar(onMicClick: () -> Unit, onOrderClick: () -> Unit) {
                 modifier = Modifier.size(40.dp).clip(CircleShape) // 아이콘 크기 조정
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text("주문하기")
+            Text(text = if (isKorean) "주문하기" else "Order")
         }
     }
 }

@@ -2,6 +2,7 @@ package com.ssafy.nhcafe.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
@@ -21,9 +22,25 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ssafy.nhcafe.R
+import com.ssafy.nhcafe.dto.MenuItem
 import com.ssafy.nhcafe.ui.common.TopBar
+import com.ssafy.nhcafe.viewModel.GPTViewModel
+
+val allMenus = listOf(
+    MenuItem("카페라떼", "부드러운 우유의 풍미", "₩3,800", R.drawable.temp_latte, "커피"),
+    MenuItem("아메리카노", "진한 커피향", "₩3,500", R.drawable.temp_americano, "커피"),
+    MenuItem("카푸치노", "풍부한 거품", "₩4,000", R.drawable.temp_cappuccino, "커피"),
+    MenuItem("레몬에이드", "상큼한 레몬맛", "₩4,200", R.drawable.temp_latte, "에이드"),
+    MenuItem("자몽에이드", "쌉싸름한 자몽", "₩4,300", R.drawable.temp_latte, "에이드"),
+    MenuItem("허브티", "편안한 허브향", "₩3,800", R.drawable.temp_latte, "티"),
+    MenuItem("치즈케이크", "진한 치즈맛", "₩4,500", R.drawable.temp_latte, "디저트"),
+    MenuItem("초코우유", "달콤한 초코", "₩3,000", R.drawable.temp_latte, "논커피")
+)
+val apiKey = "sREDACTED_PROJECT_KEY"
+
 
 @Composable
 fun MenuScreen(
@@ -34,6 +51,7 @@ fun MenuScreen(
     val categories = listOf("커피", "논커피", "디저트", "에이드", "티")
     var selectedCategory by remember { mutableStateOf(categories[0]) }
     val scrollState = rememberScrollState()
+    val gptViewModel: GPTViewModel = viewModel()
 
     // MenuScreen 내부 일부만 수정
     Column(
@@ -85,7 +103,7 @@ fun MenuScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            MenuGrid(category = selectedCategory)
+            MenuGrid(category = selectedCategory, gptViewModel = gptViewModel)
         }
 
         // 수정된 하단 마이크 버튼 영역
@@ -120,7 +138,7 @@ fun MenuScreen(
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = if (isKorean) "말하기" else "Speak",
-                        fontSize = 12.sp,
+                        fontSize = if (isKorean) 12.sp else 11.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -134,13 +152,9 @@ fun MenuScreen(
 
 
 @Composable
-fun MenuGrid(category: String) {
-    val menuItems = when (category) {
-        "커피" -> listOf("카페라떼", "아메리카노", "카푸치노", "에스프레소")
-        "에이드" -> listOf("레몬에이드", "자몽에이드")
-        "티" -> listOf("허브티", "얼그레이티")
-        else -> listOf("기본 메뉴")
-    }
+fun MenuGrid(category: String, gptViewModel: GPTViewModel) {
+    val filteredMenus = allMenus.filter { it.category == category }
+    var selectedItem by remember { mutableStateOf<MenuItem?>(null) }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -150,37 +164,104 @@ fun MenuGrid(category: String) {
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(menuItems) { item ->
-            MenuItemCard(name = item)
+        items(filteredMenus) { item ->
+            MenuItemCard(item = item, onItemClick = { selectedItem = it })
+        }
+    }
+
+    // 다이얼로그 표시
+    selectedItem?.let { item ->
+        AlertDialog(
+            onDismissRequest = { selectedItem = null
+                gptViewModel.stopTTS()},
+            confirmButton = {
+                TextButton(onClick = { selectedItem = null
+                    gptViewModel.stopTTS()}) {
+                    Text("닫기", color = Color(0xFF5D2C15))
+                }
+            },
+            shape = RoundedCornerShape(20.dp),
+            containerColor = Color(0xFFFDF6F0),  // 부드러운 베이지 계열
+            title = {
+                Text(
+                    text = item.name,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                    color = Color(0xFF3E2723)
+                )
+            },
+            text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painter = painterResource(id = item.imageRes),
+                        contentDescription = item.name,
+                        modifier = Modifier
+                            .size(120.dp)
+                            .clip(CircleShape)
+                            .background(Color(0xFFFFF3E0))
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = item.description,
+                        fontSize = 14.sp,
+                        color = Color.DarkGray
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        text = item.price,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFE7662A)
+                    )
+                }
+            }
+        )
+
+
+        // TTS 실행
+        LaunchedEffect(item) {
+            gptViewModel.stopTTS()  // 이전 TTS 중지
+            gptViewModel.playTTS(item.name + " " + item.description + " " + item.price + "원", apiKey)
         }
     }
 }
 
+
+
 @Composable
-fun MenuItemCard(name: String) {
+fun MenuItemCard(item: MenuItem, onItemClick: (MenuItem) -> Unit) {
     Box(
         modifier = Modifier
             .background(Color.White, RoundedCornerShape(16.dp))
             .fillMaxWidth()
-            .height(180.dp), // 여유 있게 조정
-        contentAlignment = Alignment.Center // 전체 중앙 정렬
+            .height(180.dp)
+            .clickable { onItemClick(item) },  // ← 클릭 시 콜백
+        contentAlignment = Alignment.Center
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.temp_latte),
-                contentDescription = "latte",
+                painter = painterResource(id = item.imageRes),
+                contentDescription = item.name,
                 modifier = Modifier
-                    .size(70.dp).clip(CircleShape)
-                    .background(Color.LightGray, shape = CircleShape)
+                    .size(70.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray)
             )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(name, fontWeight = FontWeight.SemiBold)
-            Text("₩3,800", color = Color(0xFFDD6E1F))
+            Text(item.name, fontWeight = FontWeight.SemiBold)
+            Text(item.price, color = Color(0xFFDD6E1F))
         }
     }
 }
-
