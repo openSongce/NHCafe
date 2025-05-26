@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- name space는 BookRepo의 fully qualified name으로 설정한다. -->
+<mapper namespace="com.ssafy.cafe.model.dao.OrderDao">
+
+	<insert id="insert" parameterType="Order" useGeneratedKeys="true" keyProperty="id">
+		insert into t_order (user_id, order_table, order_time, completed) 
+		values (#{userId}, #{orderTable}, now(), #{completed})
+	</insert>
+
+	<select id="selectOrderInfo" parameterType="Integer" resultType="OrderInfo">
+		select 
+			o_id id
+			, user_id
+			, order_table
+			, order_time
+			, completed 
+		from t_order where o_id = #{orderId}
+	</select>
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 관통 프로젝트 6단계에서 추가됨 -->
+    <select id="getLastMonthOrder" parameterType="string" resultType="OrderInfo">
+        select 
+            o.o_id id
+            , o.user_id 
+            , o.order_table
+            , o.order_time
+            , o.completed
+            , o.o_id as order_id
+        from t_order o 
+
+        where user_id = #{id} and order_time > date_add(now(), interval -1 month)
+        order by o.o_id desc
+    </select>
+
+    <select id="getOrderDetailInfo" parameterType="int" resultType="OrderDetailInfo">
+       select 
+            d.d_id as id
+            , o.o_id as order_id
+            , p.id as product_id
+            , d.quantity
+            , p.name
+            , p.price as unit_price
+            , d.quantity*p.price as sum_price
+            , p.type
+            , p.img
+        from t_order o 
+        join t_order_detail d on o.o_id = d.order_id
+        join t_product p on d.product_id = p.id
+        where o_id = #{order_id}
+        order by d.d_id asc;
+    </select>
+    
+    
+    
+    <!-- 관통 프로젝트 6단계에서 추가됨 -->
+    <select id="getLast6MonthOrder" parameterType="string"  resultMap="OrderResult">
+        select 
+            o.o_id id
+            , o.user_id 
+            , o.order_table
+            , o.order_time
+            , o.completed
+            , o.o_id as order_id
+        from t_order o 
+
+        where user_id = #{id} and order_time > date_add(now(), interval -6 month)
+        order by o.o_id desc
+    </select>
+        
+    <resultMap id="OrderResult" type="OrderInfo">
+        <collection property="details" javaType="ArrayList" column="order_id" ofType="OrderDetailInfo" 
+         select="getOrderDetailInfo"/>
+    </resultMap>
+    
+	
+</mapper>
