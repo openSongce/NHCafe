@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- name space는 BookRepo의 fully qualified name으로 설정한다. -->
+<mapper namespace="com.ssafy.cafe.model.dao.OrderDao">
+
+	<insert id="insert" parameterType="Order" useGeneratedKeys="true" keyProperty="id">
+		insert into t_order (user_num, order_time, completed) 
+		values (#{userId}, now(), #{completed})
+	</insert>
+
+	<select id="selectOrderInfo" parameterType="Integer" resultType="OrderInfo">
+		select 
+			o_id id
+			, user_num
+			, order_time
+			, completed 
+		from t_order where o_id = #{orderId}
+	</select>
+
+    
+	
+</mapper>
