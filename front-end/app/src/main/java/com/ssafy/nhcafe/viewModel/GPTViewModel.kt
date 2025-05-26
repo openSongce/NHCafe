@@ -11,6 +11,8 @@ import com.google.gson.reflect.TypeToken
 import com.ssafy.nhcafe.api.*
 import com.ssafy.nhcafe.dto.CartItem
 import com.ssafy.nhcafe.dto.MenuItem
+import com.ssafy.nhcafe.dto.OrderDetail
+import com.ssafy.nhcafe.dto.OrderRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -280,6 +282,43 @@ class GPTViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
+
+    fun sendOrder(phoneNumber: String?, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+        viewModelScope.launch {
+            try {
+                val cart = cartItems.value
+                val productMap = menuList.associateBy { it.name }
+
+                val details = cart.mapNotNull {
+                    val product = productMap[it.name]
+                    product?.let { p ->
+                        OrderDetail(productId = p.id, quantity = it.count)
+                    }
+                }
+
+                val totalPrice = cart.sumOf { it.count * it.price.toInt() }
+
+                val orderRequest = OrderRequest(
+                    userId = if (phoneNumber.isNullOrBlank()) "010-1234-5678" else phoneNumber,
+                    usedStamp = 0,
+                    price = totalPrice,
+                    details = details
+                )
+
+                val response = CafeApiClient.apiService.placeOrder(orderRequest)
+                if (response.isSuccessful) {
+                    Log.e("Order", "응답 코드: ${response.code()}, 메시지: ${response.message()}")
+                    val orderId = response.body()?: -1
+                    onSuccess(orderId)
+                } else {
+                    onFailure()
+                }
+            } catch (e: Exception) {
+                Log.e("Order", "주문 실패: ${e.message}")
+                onFailure()
+            }
+        }
+    }
 
 
 

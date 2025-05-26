@@ -119,9 +119,18 @@ fun PhoneNumberInputScreen(
 
         // ️ 건너뛰기
         Button(
-            onClick = { navController.navigate("completeOrder/{orderNumber}"){
-                popUpTo("main"){inclusive=false}
-            } },
+            onClick = { gptViewModel.sendOrder(
+                phoneNumber = "010-1234-5678",
+                onSuccess = { orderId ->
+                    navController.navigate("completeOrder/$orderId") {
+                        popUpTo("main") { inclusive = false }
+                    }
+                },
+                onFailure = {
+                    Toast.makeText(context, "주문에 실패했습니다.", Toast.LENGTH_SHORT).show()
+                }
+            )
+            },
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFDE4D1)),
             shape = RoundedCornerShape(16.dp),
             modifier = Modifier
