@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,8 +55,8 @@ public class UserRestController {
 		    summary = "번호 기반 로그인 및 자동 등록",
 		    description = "사용자가 번호를 보내면, 이미 존재하면 기존 사용자 정보를, 없으면 새로 등록한 후 정보를 반환한다."
 		)
-	public int loginOrRegister(@RequestBody String number, HttpServletResponse response) throws UnsupportedEncodingException {
-//	    String number = user.getNumber();
+	public int loginOrRegister(@RequestBody User user, HttpServletResponse response) throws UnsupportedEncodingException {
+	    String number = user.getNumber();
 	    User result = service.loginOrRegister(number);
 
 	    if (result != null) {
@@ -68,10 +69,6 @@ public class UserRestController {
 
 	    return result.getStamps();
 	}
-	
-	
-	//update stamp 번호주면
-	
 	
 	
 

@@ -9,24 +9,23 @@ public class OrderInfo {
     private String orderTable;
     private Date orderTime;
     private Character completed;
+    private int totalPrice;
     
-    private List<OrderDetailInfo> details ;
+   
+
+	private List<OrderDetailInfo> details ;
     
     
-	public OrderInfo(Integer id, String userId, String orderTable, Date orderTime, Character complited) {
+	public OrderInfo(Integer id, String userId, String orderTable, Date orderTime, Character complited,int totalPrice) {
         this.id = id;
         this.userId = userId;
         this.orderTable = orderTable;
         this.orderTime = orderTime;
         this.completed = complited;
+        this.totalPrice=totalPrice;
     }
 
-    public OrderInfo(String userId, String orderTable, Date orderTime, Character complited) {
-        this.userId = userId;
-        this.orderTable = orderTable;
-        this.orderTime = orderTime;
-        this.completed = complited;
-    }
+
     
 	public OrderInfo() {}
 
@@ -77,6 +76,15 @@ public class OrderInfo {
 
 	public void setDetails(List<OrderDetailInfo> details) {
 		this.details = details;
+	}
+	
+
+	 public int getTotalPrice() {
+		return totalPrice;
+	}
+
+	public void setTotalPrice(int totalPrice) {
+		this.totalPrice = totalPrice;
 	}
 
 }

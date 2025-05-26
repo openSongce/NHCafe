@@ -46,5 +46,13 @@ public class ProductRestController {
 		return new ResponseEntity<>(product,HttpStatus.OK);
 	}
 	
+	
+    @GetMapping("/type/{type}")
+    @Operation(summary = "상품 종류(type)에 해당하는 상품 목록을 반환한다")
+    public ResponseEntity<List<Product>> getProductsByType(@PathVariable String type) {
+        List<Product> list = pService.getProductListByType(type);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+	
 
 }

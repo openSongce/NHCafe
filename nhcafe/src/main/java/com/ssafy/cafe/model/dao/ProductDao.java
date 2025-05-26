@@ -2,8 +2,14 @@ package com.ssafy.cafe.model.dao;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Mapper;
+
 import com.ssafy.cafe.model.dto.Product;
 
+
+
+
+@Mapper
 public interface ProductDao {
 	
 	/**
@@ -27,4 +33,8 @@ public interface ProductDao {
      * @return
      */
     Product selectWithDesc(Integer productId);
+    
+    
+    
+    List<Product> selectProductByType(String type);
 }

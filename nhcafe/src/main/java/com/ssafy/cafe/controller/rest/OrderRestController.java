@@ -49,6 +49,7 @@ public class OrderRestController {
     	for(OrderDetail detail:order.getDetails()) {
     		if(detail.getQuantity() <= 0 || detail.getQuantity() > 15) return -2;
     	}
+    	
     	return oService.makeOrder(order);
     }
     
@@ -59,6 +60,7 @@ public class OrderRestController {
     	return oService.getOrderInfo(orderId);
     }
     
-    //type별로
+    
+    
     
 }

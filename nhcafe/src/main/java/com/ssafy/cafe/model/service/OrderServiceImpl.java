@@ -54,9 +54,22 @@ public class OrderServiceImpl implements OrderService {
         
         // userId가 같은 user를 받아온 후 stamp를 갱신함
         User user = uDao.selectById(userId);
-        user.setStamps(user.getStamps() + quantity);
+        
+        int usedStamp = order.getUsedStamp() == null ? 0 : order.getUsedStamp();
+        int updatedStamp = user.getStamps() + quantity - usedStamp;
+        if (updatedStamp < 0) updatedStamp = 0;
+        user.setStamps(updatedStamp);
         uDao.updateStamp(user);
         
+        
+        //stamp할인가격계산
+        int discount = usedStamp * 100;
+        order.setPrice(discount);
+        
+        
+//        user.setStamps(user.getStamps() + quantity);
+//        uDao.updateStamp(user);
+//        
         return id;
     }
 
@@ -81,7 +94,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderInfo getOrderInfo(Integer orderId) {
     	OrderInfo orderInfo = oDao.selectOrderInfo(orderId);
-    	orderInfo.setDetails(dDao.getOrderDetailInfo(orderId));
+    	List<OrderDetailInfo> details = dDao.getOrderDetailInfo(orderId);
+    	orderInfo.setDetails(details);
+    	
+    	int totalPrice=0;
+    	for(OrderDetailInfo detail:details) {
+    		totalPrice+=detail.getSumPrice();
+    	}
+    	
+    	orderInfo.setTotalPrice(totalPrice);
+    	
         return orderInfo;
     }
 

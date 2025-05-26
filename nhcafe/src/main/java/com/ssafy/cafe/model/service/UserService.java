@@ -23,6 +23,12 @@ public interface UserService {
      * 조회된 User 정보를 반환한다.
      */
     public User selectUser(String number);
+    
+    
+    
+    
+    
+    boolean updateStamp(User user);
 
 
 }

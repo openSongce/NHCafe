@@ -4,32 +4,42 @@ import java.util.Date;
 import java.util.List;
 
 public class Order {
-    private Integer id;
+ 
+
+	private Integer id;
     private String userId;
-    private String orderTable;
     private Date orderTime;
     private Character completed;
+    private Integer usedStamp;
+    private Integer price;
     
     private List<OrderDetail> details ;
     
-    public Order(Integer id, String userId, String orderTable, Date orderTime, Character complited) {
+   
+
+
+	public Order(Integer id, String userId, Date orderTime, Character complited,Integer usedStamp,Integer price) {
         this.id = id;
         this.userId = userId;
-        this.orderTable = orderTable;
         this.orderTime = orderTime;
         this.completed = complited;
+        this.usedStamp=usedStamp;
+        this.price=price;
     }
 
-    public Order(String userId, String orderTable, Date orderTime, Character complited) {
-        this.userId = userId;
-        this.orderTable = orderTable;
-        this.orderTime = orderTime;
-        this.completed = complited;
-    }
     
     public Order() {}
 
-        
+	public Integer getUsedStamp() {
+		return usedStamp;
+	}
+
+
+	public void setUsedStamp(Integer usedStamp) {
+		this.usedStamp = usedStamp;
+	}
+
+
 	public Integer getId() {
 		return id;
 	}
@@ -44,14 +54,6 @@ public class Order {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
-	}
-
-	public String getOrderTable() {
-		return orderTable;
-	}
-
-	public void setOrderTable(String orderTable) {
-		this.orderTable = orderTable;
 	}
 
 	public Date getOrderTime() {
@@ -77,12 +79,18 @@ public class Order {
 	public void setDetails(List<OrderDetail> details) {
 		this.details = details;
 	}
-
-	@Override
-	public String toString() {
-		return "Order [id=" + id + ", userId=" + userId + ", orderTable=" + orderTable + ", orderTime=" + orderTime
-				+ ", completed=" + completed + ", details=" + details + "]";
+   public Integer getPrice() {
+		return price;
 	}
-    
+
+
+	public void setPrice(Integer price) {
+		this.price = price;
+	}
+ @Override
+	public String toString() {
+		return "Order [id=" + id + ", userId=" + userId + ", orderTime=" + orderTime + ", completed=" + completed
+				+ ", usedStamp=" + usedStamp + ", price=" + price + ", details=" + details + "]";
+	}
     
 }

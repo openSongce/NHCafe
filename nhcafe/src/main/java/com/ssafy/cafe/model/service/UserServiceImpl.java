@@ -25,6 +25,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User loginOrRegister(String number) {
         User user = userDao.login(number);
+        
         if (user == null) {
             User newUser = new User();
             newUser.setNumber(number);
@@ -32,6 +33,8 @@ public class UserServiceImpl implements UserService {
             userDao.insert(newUser);
             return userDao.selectById(number); // 등록 후 다시 조회해서 반환
         }
+        
+        
         return user;
     }
 
@@ -50,5 +53,10 @@ public class UserServiceImpl implements UserService {
         return userDao.selectById(number);
     }
 
-    
+    @Override
+    public boolean updateStamp(User user) {
+        int result = userDao.updateStamp(user);
+        return result > 0;  // 성공 여부를 boolean으로 반환
+    }
+
 }

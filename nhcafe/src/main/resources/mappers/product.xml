@@ -31,4 +31,11 @@
 		where t_product.id = #{productId}
 	</select>
 	
+	
+	<select id="selectProductByType" resultType="Product">
+	    SELECT * 
+	    FROM t_product 
+	    WHERE type = #{type}
+	</select>
+	
 </mapper>

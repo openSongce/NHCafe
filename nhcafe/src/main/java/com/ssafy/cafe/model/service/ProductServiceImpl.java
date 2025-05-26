@@ -27,18 +27,13 @@ public class ProductServiceImpl implements ProductService{
 	public Product getProductDesc(Integer productId) {
 		return pDao.selectWithDesc(productId);
 	}
+
+	@Override
+	public List<Product> getProductListByType(String type) {
+	    return pDao.selectProductByType(type);
+	}
+
     
     
-   
-
-//    @Override
-//    public ProductWithComment selectWithComment(Integer productId) {
-//    	ProductWithComment pwc = pDao.selectWithInfo(productId);
-//    	pwc.setComments(cDao.selectByProduct(productId));
-//    	if(pwc.getId() == null) {
-//    		pwc = pDao.selectbyId(productId);
-//    	}
-//        return pwc;
-//    }
-
+  
 }
