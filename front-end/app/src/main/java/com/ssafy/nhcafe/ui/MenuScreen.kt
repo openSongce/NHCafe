@@ -249,7 +249,7 @@ fun MenuGrid(
         LaunchedEffect(item) {
             gptViewModel.stopTTS()
             gptViewModel.playTTS(
-                "${item.pDesc} ${item.price}원",
+                "${item.name} ${item.pDesc} ${item.price}원",
                 apiKey
             )
         }

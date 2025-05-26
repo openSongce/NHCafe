@@ -1,6 +1,7 @@
 package com.ssafy.nhcafe.ui
 
 import android.app.Application
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -48,6 +49,7 @@ fun OrderConfirmScreen(
     val totalCount = cartItems.sumOf { it.count }
     val totalPrice = cartItems.sumOf { it.count * it.price.toInt() }
 
+    val context = LocalContext.current
 
     Column(
         modifier = Modifier
@@ -71,18 +73,29 @@ fun OrderConfirmScreen(
 
         ) {
             Column {
-                Text("주문 내역", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF5D2C15))
+                Text(
+                    text = if (isKorean) "주문 내역" else "Order Summary",
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF5D2C15)
+                )
                 Spacer(modifier = Modifier.height(12.dp))
 
                 if (cartItems.isEmpty()) {
-                    Text("장바구니가 비어있습니다.", color = Color.Gray)
+                    Text(
+                        text = if (cartItems.isEmpty()) {
+                            if (isKorean) "장바구니가 비어있습니다." else "Your cart is empty."
+                        } else "",
+                        color = Color.Gray
+                    )
                 } else {
                     cartItems.forEach { item ->
                         OrderItem(
                             name = item.name,
                             temp = "-", // 온도 제거했으므로 빈 값 처리
                             count = item.count,
-                            price = item.price.toInt() * item.count
+                            price = item.price.toInt() * item.count,
+                            isKorean = isKorean
                         )
                     }
                 }
@@ -101,14 +114,17 @@ fun OrderConfirmScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
-                Text("총 수량", color = Color(0xFF5D2C15))
+                Text(if (isKorean) "총 수량" else "Total Quantity", color = Color(0xFF5D2C15))
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("총 결제금액", color = Color(0xFF5D2C15))
+                Text(if (isKorean) "총 결제금액" else "Total Price", color = Color(0xFF5D2C15))
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("$totalCount 잔", color = Color(0xFF5D2C15))
                 Text(
-                    "${"%,d".format(totalPrice)}원",
+                    text = "$totalCount ${if (isKorean) "잔" else "cups"}",
+                    color = Color(0xFF5D2C15)
+                )
+                Text(
+                    text = "${"%,d".format(totalPrice)}${if (isKorean) "원" else "₩"}",
                     color = Color(0xFFE7662A),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
@@ -120,7 +136,7 @@ fun OrderConfirmScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "☕ 주문 내역을 확인해 주세요.",
+            text = if (isKorean) "☕ 주문 내역을 확인해 주세요." else "☕ Please review your order.",
             modifier = Modifier.align(Alignment.CenterHorizontally),
             color = Color(0xFF5D2C15),
             fontSize = 13.sp
@@ -138,7 +154,8 @@ fun OrderConfirmScreen(
         ) {
             // 🔹 취소 버튼 (비율 고정)
             Button(
-                onClick = { navController.popBackStack() },
+                onClick = { gptViewModel.clearCart()
+                navController.popBackStack() },
                 shape = RoundedCornerShape(30.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFCEBDD)),
                 elevation = ButtonDefaults.buttonElevation(6.dp),
@@ -156,7 +173,17 @@ fun OrderConfirmScreen(
 
             // 🔸 주문 버튼 (강조 색상, 아이콘 포함)
             Button(
-                onClick = { navController.navigate("phoneNumberInput") },
+                onClick = {
+                    if (cartItems.isEmpty()) {
+                        Toast.makeText(
+                            context,
+                            if (isKorean) "장바구니가 비어있습니다." else "Your cart is empty.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        navController.navigate("phoneNumberInput")
+                    }
+                },
                 shape = RoundedCornerShape(30.dp),
                 elevation = ButtonDefaults.buttonElevation(8.dp),
                 colors = ButtonDefaults.buttonColors(
@@ -165,13 +192,12 @@ fun OrderConfirmScreen(
                 ),
                 modifier = Modifier
                     .height(56.dp)
-                    .weight(2f) // 더 길게
+                    .weight(2f)
             ) {
                 Image(
                     painter = painterResource(id = R.drawable.buy),
                     contentDescription = "장바구니",
-                    modifier = Modifier
-                        .size(30.dp).clip(CircleShape)
+                    modifier = Modifier.size(30.dp).clip(CircleShape)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -180,6 +206,7 @@ fun OrderConfirmScreen(
                     fontWeight = FontWeight.SemiBold
                 )
             }
+
         }
 
 
@@ -188,7 +215,7 @@ fun OrderConfirmScreen(
 }
 
 @Composable
-fun OrderItem(name: String, temp: String, count: Int, price: Int) {
+fun OrderItem(name: String, temp: String, count: Int, price: Int, isKorean: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -211,7 +238,10 @@ fun OrderItem(name: String, temp: String, count: Int, price: Int) {
             Text(temp, fontSize = 12.sp, color = Color.Gray)
         }
 
-        Text("$count 잔  ${"%,d".format(price)}원", fontSize = 14.sp)
+        Text(
+            "$count ${if (isKorean) "잔" else "cups"}  ${"%,d".format(price)}${if (isKorean) "원" else "₩"}",
+            fontSize = 14.sp
+        )
     }
 }
 

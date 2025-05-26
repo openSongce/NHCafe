@@ -13,6 +13,8 @@ import com.ssafy.nhcafe.dto.CartItem
 import com.ssafy.nhcafe.dto.MenuItem
 import com.ssafy.nhcafe.dto.OrderDetail
 import com.ssafy.nhcafe.dto.OrderRequest
+import com.ssafy.nhcafe.dto.UserInfo
+import com.ssafy.nhcafe.dto.UserRequest
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -283,7 +285,7 @@ class GPTViewModel(application: Application) : AndroidViewModel(application) {
 
 
 
-    fun sendOrder(phoneNumber: String?, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
+    fun sendOrder(phoneNumber: String?, usedStamp: Int, onSuccess: (Int) -> Unit, onFailure: () -> Unit) {
         viewModelScope.launch {
             try {
                 val cart = cartItems.value
@@ -291,35 +293,57 @@ class GPTViewModel(application: Application) : AndroidViewModel(application) {
 
                 val details = cart.mapNotNull {
                     val product = productMap[it.name]
-                    product?.let { p ->
-                        OrderDetail(productId = p.id, quantity = it.count)
-                    }
+                    product?.let { p -> OrderDetail(productId = p.id, quantity = it.count) }
                 }
 
-                val totalPrice = cart.sumOf { it.count * it.price.toInt() }
+                val totalPrice = cart.sumOf { it.count * it.price.toInt() } - (usedStamp * 100)
 
                 val orderRequest = OrderRequest(
-                    userId = if (phoneNumber.isNullOrBlank()) "010-1234-5678" else phoneNumber,
-                    usedStamp = 0,
+                    userId = phoneNumber ?: "guest",
+                    usedStamp = usedStamp,
                     price = totalPrice,
                     details = details
                 )
 
                 val response = CafeApiClient.apiService.placeOrder(orderRequest)
                 if (response.isSuccessful) {
-                    Log.e("Order", "응답 코드: ${response.code()}, 메시지: ${response.message()}")
-                    val orderId = response.body()?: -1
-                    onSuccess(orderId)
+                    onSuccess(response.body() ?: -1)
                 } else {
                     onFailure()
                 }
             } catch (e: Exception) {
-                Log.e("Order", "주문 실패: ${e.message}")
+                Log.e("Order", "에러: ${e.message}")
                 onFailure()
             }
         }
     }
 
+
+
+    fun getOrCreateUser(phoneNumber: String, onResult: (Int?) -> Unit) {
+        viewModelScope.launch {
+            try {
+                val request = UserRequest(number = phoneNumber)
+                val response = CafeApiClient.apiService.getOrCreateUser(request)
+
+                if (response.isSuccessful) {
+                    val stampCount = response.body()
+                    onResult(stampCount)
+                } else {
+                    Log.e("UserAPI", "응답 실패: ${response.code()} ${response.message()}")
+                    onResult(null)
+                }
+            } catch (e: Exception) {
+                Log.e("UserAPI", "예외 발생: ${e.message}")
+                onResult(null)
+            }
+        }
+    }
+
+
+    fun clearCart() {
+        _cartItems.value = emptyList()
+    }
 
 
 }

@@ -45,6 +45,7 @@ fun CompleteOrderScreen(
     val apiKey = BuildConfig.OPEN_API_KEY
 
     LaunchedEffect(Unit) {
+        gptViewModel.clearCart()
         val message = if (isKorean) "주문이 완료되었습니다. 주문번호는 $orderNumber 번입니다." else "Order completed. Your order number is $orderNumber."
         gptViewModel.playTTS(message, apiKey)
     }
