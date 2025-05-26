@@ -18,6 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.ssafy.nhcafe.BuildConfig
 import com.ssafy.nhcafe.R
 import com.ssafy.nhcafe.api.RecommendedMenu
 import com.ssafy.nhcafe.ui.common.TopBar
@@ -35,7 +36,7 @@ fun MainScreen(
 
     val gptViewModel: GPTViewModel = viewModel()
     val recommendedMenus by gptViewModel.recommendedMenus.collectAsState()
-    val apiKey = "sREDACTED_PROJECT_KEY"
+    val apiKey = BuildConfig.OPEN_API_KEY
 
 
     Column(

@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.ssafy.nhcafe.BuildConfig
 import com.ssafy.nhcafe.R
 import com.ssafy.nhcafe.ui.common.TopBar
 import com.ssafy.nhcafe.viewModel.GPTViewModel
@@ -41,7 +42,7 @@ fun CompleteOrderScreen(
     orderNumber: Int = 123 // 기본값 예시
 ) {
     val gptViewModel: GPTViewModel = viewModel()
-    val apiKey = "sREDACTED_PROJECT_KEY"
+    val apiKey = BuildConfig.OPEN_API_KEY
 
     LaunchedEffect(Unit) {
         val message = if (isKorean) "주문이 완료되었습니다. 주문번호는 $orderNumber 번입니다." else "Order completed. Your order number is $orderNumber."

@@ -53,6 +53,7 @@ import com.ssafy.nhcafe.viewModel.GPTViewModel
 import com.ssafy.nhcafe.viewModel.SpeechViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.animation.core.*
+import com.ssafy.nhcafe.BuildConfig
 
 
 @Composable
@@ -70,8 +71,8 @@ fun ConversationScreen(navController: NavController,
     )
     val recognizedText by speechViewModel.recognizedText.collectAsState()
     val isListening by speechViewModel.isListening.collectAsState()
-    val apiKey = "sREDACTED_PROJECT_KEY"
-
+    val apiKey = BuildConfig.OPEN_API_KEY
+    val askTemperature by gptViewModel.askTemperature.collectAsState()
 
 
     Column(

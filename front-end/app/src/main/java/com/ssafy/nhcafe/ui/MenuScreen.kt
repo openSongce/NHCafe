@@ -1,5 +1,6 @@
 package com.ssafy.nhcafe.ui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,28 +19,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.ssafy.nhcafe.BuildConfig
 import com.ssafy.nhcafe.R
+import com.ssafy.nhcafe.api.CafeApiClient
 import com.ssafy.nhcafe.dto.MenuItem
 import com.ssafy.nhcafe.ui.common.TopBar
 import com.ssafy.nhcafe.viewModel.GPTViewModel
 
-val allMenus = listOf(
-    MenuItem("카페라떼", "부드러운 우유의 풍미", "₩3,800", R.drawable.temp_latte, "커피"),
-    MenuItem("아메리카노", "진한 커피향", "₩3,500", R.drawable.temp_americano, "커피"),
-    MenuItem("카푸치노", "풍부한 거품", "₩4,000", R.drawable.temp_cappuccino, "커피"),
-    MenuItem("레몬에이드", "상큼한 레몬맛", "₩4,200", R.drawable.temp_latte, "에이드"),
-    MenuItem("자몽에이드", "쌉싸름한 자몽", "₩4,300", R.drawable.temp_latte, "에이드"),
-    MenuItem("허브티", "편안한 허브향", "₩3,800", R.drawable.temp_latte, "티"),
-    MenuItem("치즈케이크", "진한 치즈맛", "₩4,500", R.drawable.temp_latte, "디저트"),
-    MenuItem("초코우유", "달콤한 초코", "₩3,000", R.drawable.temp_latte, "논커피")
-)
-val apiKey = "sREDACTED_PROJECT_KEY"
+
+val apiKey = BuildConfig.OPEN_API_KEY
 
 
 @Composable
@@ -48,10 +43,11 @@ fun MenuScreen(
     isKorean: Boolean,
     onLanguageToggle: () -> Unit
 ) {
-    val categories = listOf("커피", "논커피", "디저트", "에이드", "티")
+    val categories = listOf("coffee", "noncoffee", "cookie", "ade", "tea")
     var selectedCategory by remember { mutableStateOf(categories[0]) }
     val scrollState = rememberScrollState()
     val gptViewModel: GPTViewModel = viewModel()
+    var allMenus by remember { mutableStateOf(listOf<MenuItem>()) }
 
     // MenuScreen 내부 일부만 수정
     Column(
@@ -103,7 +99,7 @@ fun MenuScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            MenuGrid(category = selectedCategory, gptViewModel = gptViewModel)
+            MenuGrid(category = selectedCategory, allMenus, gptViewModel = gptViewModel)
         }
 
         // 수정된 하단 마이크 버튼 영역
@@ -147,13 +143,32 @@ fun MenuScreen(
 
     }
 
+    LaunchedEffect(Unit) {
+        try {
+            val response = CafeApiClient.apiService.getMenuList()
+            if (response.isSuccessful) {
+                allMenus = response.body() ?: emptyList()
+                // 상태 저장해서 LazyColumn 등에 표시
+                Log.d("MenuScreen", "불러온 메뉴: $allMenus")
+            } else {
+                Log.e("MenuScreen", "응답 실패: ${response.code()}")
+            }
+        } catch (e: Exception) {
+            Log.e("MenuScreen", "에러: ${e.message}")
+        }
+    }
+
 }
 
 
 
 @Composable
-fun MenuGrid(category: String, gptViewModel: GPTViewModel) {
-    val filteredMenus = allMenus.filter { it.category == category }
+fun MenuGrid(
+    category: String,
+    menus: List<MenuItem>,
+    gptViewModel: GPTViewModel
+) {
+    val filteredMenus = menus.filter { it.type == category }
     var selectedItem by remember { mutableStateOf<MenuItem?>(null) }
 
     LazyVerticalGrid(
@@ -172,16 +187,20 @@ fun MenuGrid(category: String, gptViewModel: GPTViewModel) {
     // 다이얼로그 표시
     selectedItem?.let { item ->
         AlertDialog(
-            onDismissRequest = { selectedItem = null
-                gptViewModel.stopTTS()},
+            onDismissRequest = {
+                selectedItem = null
+                gptViewModel.stopTTS()
+            },
             confirmButton = {
-                TextButton(onClick = { selectedItem = null
-                    gptViewModel.stopTTS()}) {
+                TextButton(onClick = {
+                    selectedItem = null
+                    gptViewModel.stopTTS()
+                }) {
                     Text("닫기", color = Color(0xFF5D2C15))
                 }
             },
             shape = RoundedCornerShape(20.dp),
-            containerColor = Color(0xFFFDF6F0),  // 부드러운 베이지 계열
+            containerColor = Color(0xFFFDF6F0),
             title = {
                 Text(
                     text = item.name,
@@ -198,7 +217,7 @@ fun MenuGrid(category: String, gptViewModel: GPTViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Image(
-                        painter = painterResource(id = item.imageRes),
+                        painter = painterResource(R.drawable.temp_latte),
                         contentDescription = item.name,
                         modifier = Modifier
                             .size(120.dp)
@@ -209,7 +228,7 @@ fun MenuGrid(category: String, gptViewModel: GPTViewModel) {
                     Spacer(modifier = Modifier.height(12.dp))
 
                     Text(
-                        text = item.description,
+                        text = item.pDesc,
                         fontSize = 14.sp,
                         color = Color.DarkGray
                     )
@@ -217,7 +236,7 @@ fun MenuGrid(category: String, gptViewModel: GPTViewModel) {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = item.price,
+                        text = "${item.price}원",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFE7662A)
@@ -226,14 +245,17 @@ fun MenuGrid(category: String, gptViewModel: GPTViewModel) {
             }
         )
 
-
         // TTS 실행
         LaunchedEffect(item) {
-            gptViewModel.stopTTS()  // 이전 TTS 중지
-            gptViewModel.playTTS(item.name + " " + item.description + " " + item.price + "원", apiKey)
+            gptViewModel.stopTTS()
+            gptViewModel.playTTS(
+                "${item.pDesc} ${item.price}원",
+                apiKey
+            )
         }
     }
 }
+
 
 
 
@@ -252,7 +274,7 @@ fun MenuItemCard(item: MenuItem, onItemClick: (MenuItem) -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
             Image(
-                painter = painterResource(id = item.imageRes),
+                painter = painterResource(R.drawable.temp_latte),
                 contentDescription = item.name,
                 modifier = Modifier
                     .size(70.dp)
@@ -261,7 +283,7 @@ fun MenuItemCard(item: MenuItem, onItemClick: (MenuItem) -> Unit) {
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(item.name, fontWeight = FontWeight.SemiBold)
-            Text(item.price, color = Color(0xFFDD6E1F))
+            Text(item.price + "원", color = Color(0xFFDD6E1F))
         }
     }
 }

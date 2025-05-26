@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ssafy.nhcafe.api.*
+import com.ssafy.nhcafe.dto.PendingOrder
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -28,18 +29,6 @@ class GPTViewModel(application: Application) : AndroidViewModel(application) {
     )
     val chatResponse: StateFlow<String> get() = _chatResponse
 
-    val prompt = """
-카페의 추천 메뉴 3가지를 JSON 배열 형태로 반환해주세요.
-절대로 다른 문장이나 설명을 넣지 말고, 오직 JSON만 반환해주세요.
-image는 latte, americano, cappuccino 셋 중에 하나 랜덤으로
-그냥 말로만 해줘
-예:
-[
-  {"name": "카페라떼", "description": "부드러운 우유의 풍미", "image": "latte"},
-  {"name": "아메리카노", "description": "진한 에스프레소의 깊은 맛", "image": "americano"},
-  {"name": "카푸치노", "description": "풍부한 거품과 진한 맛", "image": "cappuccino"}
-]
-""".trimIndent()
 
     fun getLocalizedPrompt(isKorean: Boolean): String {
         return if (isKorean) {
@@ -190,5 +179,63 @@ image는 latte, americano, cappuccino 셋 중에 하나 랜덤으로
     fun clearChatResponse() {
         _chatResponse.value = ""
         conversationHistory.retainAll { it.role == "system" }
+    }
+
+
+    private val _askTemperature = MutableStateFlow<String?>(null)
+    val askTemperature: StateFlow<String?> get() = _askTemperature
+
+    private val _cartItems = MutableStateFlow<List<Pair<String, String>>>(emptyList())
+    val cartItems: StateFlow<List<Pair<String, String>>> get() = _cartItems
+
+    private var pendingOrder: PendingOrder? = null
+
+    fun handleUserInput(text: String) {
+        val name = extractMenuName(text)
+        val temperature = extractTemperature(text)
+
+        if (name != null) {
+            if (temperature != null) {
+                addToCart(name, temperature)
+            } else {
+                pendingOrder = PendingOrder(name)
+                _askTemperature.value = "$name 는 ICE로 드릴까요, HOT으로 드릴까요?"
+            }
+        } else {
+            _chatResponse.value = "죄송해요, 무슨 메뉴를 원하시는지 잘 모르겠어요."
+        }
+    }
+
+    fun onTemperatureSelected(text: String) {
+        val temp = extractTemperature(text)
+        pendingOrder?.let {
+            if (temp != null) {
+                addToCart(it.name, temp)
+                pendingOrder = null
+                _askTemperature.value = null
+            } else {
+                _askTemperature.value = "ICE 또는 HOT으로 말씀해주세요."
+            }
+        }
+    }
+
+    private fun addToCart(name: String, temperature: String) {
+        val updated = _cartItems.value.toMutableList()
+        updated.add(name to temperature)
+        _cartItems.value = updated
+        _chatResponse.value = "$temperature $name 를 장바구니에 담았습니다."
+    }
+
+    private fun extractMenuName(text: String): String? {
+        val menuKeywords = listOf("아메리카노", "카페라떼", "카푸치노", "바닐라라떼", "콜드브루", "말차", "아이스티")
+        return menuKeywords.firstOrNull { text.contains(it) }
+    }
+
+    private fun extractTemperature(text: String): String? {
+        return when {
+            text.contains("ice", true) || text.contains("아이스") -> "ICE"
+            text.contains("hot", true) || text.contains("핫") -> "HOT"
+            else -> null
+        }
     }
 }
