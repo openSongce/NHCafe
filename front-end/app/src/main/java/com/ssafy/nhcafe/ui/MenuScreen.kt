@@ -41,12 +41,12 @@ val apiKey = BuildConfig.OPEN_API_KEY
 fun MenuScreen(
     navController: NavController,
     isKorean: Boolean,
-    onLanguageToggle: () -> Unit
+    onLanguageToggle: () -> Unit,
+    gptViewModel: GPTViewModel
 ) {
-    val categories = listOf("coffee", "noncoffee", "cookie", "ade", "tea")
+    val categories = listOf("Coffee", "Non-Coffee", "Dessert", "Ade", "Tea")
     var selectedCategory by remember { mutableStateOf(categories[0]) }
     val scrollState = rememberScrollState()
-    val gptViewModel: GPTViewModel = viewModel()
     var allMenus by remember { mutableStateOf(listOf<MenuItem>()) }
 
     // MenuScreen 내부 일부만 수정

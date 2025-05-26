@@ -38,12 +38,14 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.ssafy.nhcafe.R
 import com.ssafy.nhcafe.ui.common.TopBar
+import com.ssafy.nhcafe.viewModel.GPTViewModel
 
 @Composable
 fun PhoneNumberInputScreen(
     isKorean: Boolean,
     onLanguageToggle: () -> Unit,
     navController: NavController,
+    gptViewModel: GPTViewModel
 ) {
     var phoneNumber by remember { mutableStateOf("") }
     var showNumpad by remember { mutableStateOf(false) }

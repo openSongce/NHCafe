@@ -39,9 +39,9 @@ fun CompleteOrderScreen(
     navController: NavController,
     isKorean: Boolean,
     onLanguageToggle: () -> Unit,
-    orderNumber: Int = 123 // 기본값 예시
+    orderNumber: Int = 123, // 기본값 예시
+    gptViewModel: GPTViewModel
 ) {
-    val gptViewModel: GPTViewModel = viewModel()
     val apiKey = BuildConfig.OPEN_API_KEY
 
     LaunchedEffect(Unit) {

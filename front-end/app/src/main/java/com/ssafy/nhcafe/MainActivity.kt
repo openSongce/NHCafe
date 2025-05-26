@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ssafy.nhcafe.ui.CompleteOrderScreen
 import com.ssafy.nhcafe.ui.ConversationScreen
 import com.ssafy.nhcafe.ui.MainScreen
@@ -26,6 +27,7 @@ import com.ssafy.nhcafe.ui.PhoneNumberInputScreen
 import com.ssafy.nhcafe.ui.SplashScreen
 import com.ssafy.nhcafe.ui.StampScreen
 import com.ssafy.nhcafe.ui.theme.NHCafeTheme
+import com.ssafy.nhcafe.viewModel.GPTViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +43,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
+            val gptViewModel: GPTViewModel = viewModel()
             val navController = rememberNavController()
             var isKorean by remember { mutableStateOf(true) }
 
@@ -52,20 +55,23 @@ class MainActivity : ComponentActivity() {
                     MainScreen(
                         navController = navController,
                         isKorean = isKorean,
-                        onLanguageToggle = { isKorean = !isKorean }
+                        onLanguageToggle = { isKorean = !isKorean },
+                        gptViewModel = gptViewModel
                     )
                 }
                 composable("conversation") {
                     ConversationScreen(
                         navController = navController,
                         isKorean = isKorean,
-                        onLanguageToggle = { isKorean = !isKorean })
+                        onLanguageToggle = { isKorean = !isKorean },
+                        gptViewModel = gptViewModel)
                 }
                 composable("orderConfirm") {
                     OrderConfirmScreen(
                         navController = navController,
                         isKorean = isKorean,
-                        onLanguageToggle = { isKorean = !isKorean }
+                        onLanguageToggle = { isKorean = !isKorean },
+                        gptViewModel = gptViewModel
                     )
                 }
                 composable("phoneNumberInput") {
@@ -73,6 +79,7 @@ class MainActivity : ComponentActivity() {
                         isKorean = isKorean,                // 현재 언어 상태
                         onLanguageToggle = { isKorean = !isKorean },  // 언어 토글
                         navController = navController, // 닫기 버튼 (뒤로가기)
+                        gptViewModel = gptViewModel
                     )
                 }
                 composable("stamp/{phoneNumber}") { backStackEntry ->
@@ -81,7 +88,8 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         isKorean = isKorean,
                         onLanguageToggle = { isKorean = !isKorean },
-                        phoneNumber = phoneNumber
+                        phoneNumber = phoneNumber,
+                        gptViewModel = gptViewModel
                     )
                 }
                 composable("completeOrder/{orderNumber}") { backStackEntry ->
@@ -90,14 +98,16 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         isKorean = isKorean,
                         onLanguageToggle = { isKorean = !isKorean },
-                        orderNumber = orderNumber
+                        orderNumber = orderNumber,
+                        gptViewModel = gptViewModel
                     )
                 }
                 composable("menu") {
                     MenuScreen(
                         navController = navController,
                         isKorean = isKorean,
-                        onLanguageToggle = { isKorean = !isKorean }
+                        onLanguageToggle = { isKorean = !isKorean },
+                        gptViewModel = gptViewModel
                     )
                 }
 

@@ -1,5 +1,6 @@
 package com.ssafy.nhcafe.ui
 
+import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -30,13 +31,24 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ssafy.nhcafe.R
 import com.ssafy.nhcafe.ui.common.TopBar
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.platform.LocalContext
+import com.ssafy.nhcafe.viewModel.GPTViewModel
 
 @Composable
 fun OrderConfirmScreen(
     navController: NavController,
     isKorean: Boolean,
-    onLanguageToggle: () -> Unit
+    onLanguageToggle: () -> Unit,
+    gptViewModel: GPTViewModel
 ) {
+    // MainActivity 또는 상위 NavHost를 갖는 Composable에서 ViewModel 선언
+    val cartItems = gptViewModel.cartItems.collectAsState().value
+    val totalCount = cartItems.sumOf { it.count }
+    val totalPrice = cartItems.sumOf { it.count * it.price.toInt() }
+
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -62,9 +74,19 @@ fun OrderConfirmScreen(
                 Text("주문 내역", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF5D2C15))
                 Spacer(modifier = Modifier.height(12.dp))
 
-                OrderItem("아메리카노", "Hot", 2, 8000)
-                OrderItem("카페라떼", "Ice", 1, 4500)
-                OrderItem("바닐라라떼", "Hot", 1, 5000)
+                if (cartItems.isEmpty()) {
+                    Text("장바구니가 비어있습니다.", color = Color.Gray)
+                } else {
+                    cartItems.forEach { item ->
+                        OrderItem(
+                            name = item.name,
+                            temp = "-", // 온도 제거했으므로 빈 값 처리
+                            count = item.count,
+                            price = item.price.toInt() * item.count
+                        )
+                    }
+                }
+
             }
         }
 
@@ -84,14 +106,14 @@ fun OrderConfirmScreen(
                 Text("총 결제금액", color = Color(0xFF5D2C15))
             }
             Column(horizontalAlignment = Alignment.End) {
-                Text("4잔", color = Color(0xFF5D2C15))
-                Spacer(modifier = Modifier.height(4.dp))
+                Text("$totalCount 잔", color = Color(0xFF5D2C15))
                 Text(
-                    "17,500원",
+                    "${"%,d".format(totalPrice)}원",
                     color = Color(0xFFE7662A),
                     fontWeight = FontWeight.Bold,
                     fontSize = 18.sp
                 )
+
             }
         }
 

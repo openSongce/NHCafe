@@ -2,7 +2,6 @@ package com.ssafy.nhcafe.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,13 +29,15 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.ssafy.nhcafe.R
 import com.ssafy.nhcafe.ui.common.TopBar
+import com.ssafy.nhcafe.viewModel.GPTViewModel
 
 @Composable
 fun StampScreen(
     navController: NavController,
     isKorean: Boolean,
     onLanguageToggle: () -> Unit,
-    phoneNumber: String // 전달받은 전화번호
+    phoneNumber: String, // 전달받은 전화번호
+    gptViewModel: GPTViewModel
 ) {
     Column(
         modifier = Modifier

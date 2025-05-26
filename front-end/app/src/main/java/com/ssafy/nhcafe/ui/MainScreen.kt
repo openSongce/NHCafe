@@ -31,10 +31,10 @@ import com.ssafy.nhcafe.viewModel.GPTViewModel
 fun MainScreen(
     navController: NavController,
     isKorean: Boolean,
-    onLanguageToggle: () -> Unit
+    onLanguageToggle: () -> Unit,
+    gptViewModel: GPTViewModel
 ) {
 
-    val gptViewModel: GPTViewModel = viewModel()
     val recommendedMenus by gptViewModel.recommendedMenus.collectAsState()
     val apiKey = BuildConfig.OPEN_API_KEY
 

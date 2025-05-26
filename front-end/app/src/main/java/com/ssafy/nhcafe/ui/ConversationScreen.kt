@@ -1,6 +1,7 @@
 package com.ssafy.nhcafe.ui
 
 import android.app.Application
+import android.util.Log
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -53,18 +54,19 @@ import com.ssafy.nhcafe.viewModel.GPTViewModel
 import com.ssafy.nhcafe.viewModel.SpeechViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.animation.core.*
+import androidx.compose.runtime.mutableStateListOf
 import com.ssafy.nhcafe.BuildConfig
+import com.ssafy.nhcafe.dto.CartItem
 
 
 @Composable
 fun ConversationScreen(navController: NavController,
                        isKorean: Boolean,
-                       onLanguageToggle: () -> Unit) {
+                       onLanguageToggle: () -> Unit,
+                       gptViewModel: GPTViewModel) {
     var messages by remember { mutableStateOf(listOf<Message>()) }
     val listState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val gptViewModel: GPTViewModel = viewModel()
     val gptResponse by gptViewModel.chatResponse.collectAsState()
     val speechViewModel: SpeechViewModel = viewModel(
         factory = ViewModelProvider.AndroidViewModelFactory(context.applicationContext as Application)
@@ -72,8 +74,6 @@ fun ConversationScreen(navController: NavController,
     val recognizedText by speechViewModel.recognizedText.collectAsState()
     val isListening by speechViewModel.isListening.collectAsState()
     val apiKey = BuildConfig.OPEN_API_KEY
-    val askTemperature by gptViewModel.askTemperature.collectAsState()
-
 
     Column(
         modifier = Modifier
@@ -141,6 +141,9 @@ fun ConversationScreen(navController: NavController,
     LaunchedEffect(recognizedText) {
         if (recognizedText.isNotBlank()) {
             messages = messages + Message(recognizedText, isUser = true)
+
+            gptViewModel.handleUserInput(recognizedText)  // 🔥 여기서 메뉴 파싱 + 장바구니 처리
+
             gptViewModel.sendMessageToGPT(recognizedText, apiKey)
         }
     }
