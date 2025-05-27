@@ -11,17 +11,19 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.ssafy.nhcafe.BuildConfig
 import com.ssafy.nhcafe.R
 import com.ssafy.nhcafe.api.RecommendedMenu
+import com.ssafy.nhcafe.dto.MenuItem
 import com.ssafy.nhcafe.ui.common.TopBar
+import com.ssafy.nhcafe.ui.common.camelToSnake
 import com.ssafy.nhcafe.viewModel.GPTViewModel
 
 
@@ -51,7 +53,7 @@ fun MainScreen(
         Spacer(modifier = Modifier.height(20.dp))
         RecommendedMenuSection(isKorean = isKorean, menus = recommendedMenus)
         Spacer(modifier = Modifier.weight(1f))
-        MenuSection(isKorean, moreClick = { navController.navigate("menu")})
+        MenuSection(menuList = gptViewModel.menuList, isKorean, moreClick = { navController.navigate("menu")})
         Spacer(modifier = Modifier.weight(1f))
         VoiceInputSection(
             isKorean = isKorean,
@@ -123,7 +125,10 @@ fun RecommendedMenuSection(isKorean: Boolean, menus: List<RecommendedMenu>) {
 
 
 @Composable
-fun MenuSection(isKorean: Boolean, moreClick : () -> Unit) {
+fun MenuSection(menuList: List<MenuItem>, isKorean: Boolean, moreClick : () -> Unit) {
+
+    val randomMenus = remember(menuList) { menuList.shuffled().take(3) }
+
     Column {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -151,9 +156,10 @@ fun MenuSection(isKorean: Boolean, moreClick : () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            MenuCard(R.drawable.temp_latte, if (isKorean) "카페라떼" else "Café Latte", if (isKorean) "부드러운 라떼" else "Smooth Latte")
-            MenuCard(R.drawable.temp_americano, if (isKorean) "아메리카노" else "Americano", if (isKorean) "진한 커피향" else "Deep Coffee")
-            MenuCard(R.drawable.temp_cappuccino, if (isKorean) "카푸치노" else "Cappuccino", if (isKorean) "풍부한 거품" else "Rich Foam")
+            randomMenus.forEach { menu ->
+                val imageId = getDrawableIdFromImageName(menu.img)
+                MenuCard(imageRes = imageId, title = menu.name, subtitle = menu.pDesc)
+            }
         }
     }
 }
@@ -246,6 +252,15 @@ fun VoiceInputSection(isKorean: Boolean,  onSpeakClick: () -> Unit) {
             color = Color.LightGray
         )
     }
+
+
+}
+
+@Composable
+fun getDrawableIdFromImageName(imgName: String): Int {
+    val context = LocalContext.current
+    val resourceName = imgName.removeSuffix(".jpg").removeSuffix(".jpeg").camelToSnake()
+    return context.resources.getIdentifier(resourceName, "drawable", context.packageName)
 }
 
 
