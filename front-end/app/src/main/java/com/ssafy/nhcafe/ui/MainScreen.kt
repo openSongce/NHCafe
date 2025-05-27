@@ -168,6 +168,8 @@ fun MenuSection(menuList: List<MenuItem>, isKorean: Boolean, moreClick : () -> U
 
 @Composable
 fun MenuCard(imageRes: Int, title: String, subtitle: String) {
+
+    val validImageRes = if (imageRes != 0) imageRes else R.drawable.temp_latte
     Column(
         modifier = Modifier
             .width(100.dp)
@@ -177,7 +179,7 @@ fun MenuCard(imageRes: Int, title: String, subtitle: String) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Image(
-            painter = painterResource(id = imageRes),
+            painter = painterResource(id = validImageRes),
             contentDescription = title,
             modifier = Modifier.size(48.dp).shadow(4.dp, shape = CircleShape)
         )
