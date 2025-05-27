@@ -1,5 +1,6 @@
 package com.ssafy.nhcafe.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -106,7 +107,9 @@ fun StampScreen(
                 Image(
                     painter = painterResource(R.drawable.gift1),
                     contentDescription = null,
-                    modifier = Modifier.size(32.dp).clip(CircleShape)
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
@@ -153,7 +156,9 @@ fun StampScreen(
             Image(
                 painter = painterResource(R.drawable.check),
                 contentDescription = null,
-                modifier = Modifier.size(32.dp).clip(CircleShape)
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
@@ -187,7 +192,9 @@ fun StampScreen(
             Image(
                 painter = painterResource(R.drawable.x),
                 contentDescription = null,
-                modifier = Modifier.size(32.dp).clip(CircleShape)
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
