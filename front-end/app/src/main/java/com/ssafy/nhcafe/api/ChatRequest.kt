@@ -1,7 +1,7 @@
 package com.ssafy.nhcafe.api
 
 data class ChatRequest(
-    val model: String = "gpt-4o",
+    val model: String = "gpt-4o-mini",
     val messages: List<Message>
 )
 

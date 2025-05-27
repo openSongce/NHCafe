@@ -68,37 +68,59 @@ class GPTViewModel(application: Application) : AndroidViewModel(application) {
 
 
     fun getLocalizedPrompt(isKorean: Boolean): String {
+        val itemList = menuList.joinToString(separator = ",\n") { item ->
+            val imageSnake = item.img.replace(Regex("([a-z])([A-Z])"), "$1_$2").lowercase()
+            """{"name": "${item.name}", "description": "${item.pDesc}", "image": "$imageSnake"}"""
+        }
+
         return if (isKorean) {
             """
-            카페의 추천 메뉴 3가지를 JSON 배열 형태로 반환해주세요.
-            절대로 다른 문장이나 설명을 넣지 말고, 오직 JSON만 반환해주세요.
-            image는 latte, americano, cappuccino 셋 중에 하나 랜덤으로
-            그냥 말로만 해줘
-            예:
-            [
-              {"name": "카페라떼", "description": "부드러운 우유의 풍미", "image": "latte"},
-              {"name": "아메리카노", "description": "진한 에스프레소의 깊은 맛", "image": "americano"},
-              {"name": "카푸치노", "description": "풍부한 거품과 진한 맛", "image": "cappuccino"}
-            ]
+        아래는 우리 NHCafe의 전체 메뉴입니다.
+        이 중에서 무작위로 3개를 골라 JSON 배열 형태로 반환해주세요.
+        반드시 name, description, image 3개의 키를 포함해야 하며,
+        다른 텍스트는 절대 포함하지 마세요.
+        그냥 말로만 해줘. ```붙이지 말고
+        예:
+        [
+          {"name": "아메리카노", "description": "진한 에스프레소 커피", "image": "americano"},
+          {"name": "카라멜 너츠 라떼", "description": "고소한 너트와 달콤한 카라멜", "image": "caramel_nuts_latte"},
+          {"name": "딸기 밀크", "description": "달콤한 딸기와 우유", "image": "strawberry_milk"}
+        ]
+        
+        아래는 메뉴 목록입니다:
+        [
+        $itemList
+        ]
         """.trimIndent()
         } else {
-            """
-            카페의 추천 메뉴 3가지를 JSON 배열 형태로 반환해주세요.
-            절대로 다른 문장이나 설명을 넣지 말고, 오직 JSON만 반환해주세요.
-            image는 latte, americano, cappuccino 셋 중에 하나 랜덤으로
-            name이랑 description을 영어로 해줘.
-            그냥 말로만 해줘. 
-            예:
-            [
-              {"name": "카페라떼", "description": "부드러운 우유의 풍미", "image": "latte"},
-              {"name": "아메리카노", "description": "진한 에스프레소의 깊은 맛", "image": "americano"},
-              {"name": "카푸치노", "description": "풍부한 거품과 진한 맛", "image": "cappuccino"}
-            ]
-            
+            val englishItems = menuList.joinToString(separator = ",\n") { item ->
+                val imageSnake = item.img.replace(Regex("([a-z])([A-Z])"), "$1_$2").lowercase()
+                """{"name": "${item.name}", "description": "${item.pDesc}", "image": "$imageSnake"}"""
+            }
 
+            """
+        아래는 우리 NHCafe의 전체 메뉴입니다.
+        이 중에서 무작위로 3개를 골라 JSON 배열 형태로 반환해주세요.
+        반드시 name, description, image 3개의 키를 포함해야 하며,
+        다른 텍스트는 절대 포함하지 마세요.
+        이번에는 name, description, image를 영어로.
+        그냥 말로만 해줘. ```붙이지 말고
+
+        Example:
+        [
+          {"name": "Americano", "description": "Rich espresso with water", "image": "americano"},
+          {"name": "Vanilla Cream Coffee", "description": "Sweet vanilla and soft cream", "image": "vanilla_cream_coffee"},
+          {"name": "Matcha Cream Latte", "description": "Smooth latte with matcha", "image": "matcha_cream_latte"}
+        ]
+
+        Menu list:
+        [
+        $englishItems
+        ]
         """.trimIndent()
         }
     }
+
 
 
 
@@ -191,7 +213,7 @@ class GPTViewModel(application: Application) : AndroidViewModel(application) {
             try {
                 val prompt = getLocalizedPrompt(isKorean)
                 val request = ChatRequest(
-                    model = "gpt-4o",
+                    model = "gpt-4o-mini",
                     messages = listOf(Message("user", prompt))
                 )
                 val response = RetrofitClient.create(apiKey).getChatCompletion(request)

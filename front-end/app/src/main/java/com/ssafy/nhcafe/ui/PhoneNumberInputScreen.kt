@@ -153,22 +153,7 @@ fun PhoneNumberInputScreen(
                     if (stampCount == null) {
                         Toast.makeText(context, "사용자 정보를 불러올 수 없습니다.", Toast.LENGTH_SHORT).show()
                     } else {
-                        if (stampCount == 0) {
-                            // 👉 주문 먼저 저장한 뒤 → 주문 완료 화면으로 이동
-                            gptViewModel.sendOrder(
-                                phoneNumber = phoneNumber,
-                                usedStamp = 0,
-                                onSuccess = { orderId ->
-                                    navController.navigate("completeOrder/$orderId")
-                                },
-                                onFailure = {
-                                    Toast.makeText(context, "주문에 실패했습니다.", Toast.LENGTH_SHORT).show()
-                                }
-                            )
-                        } else {
-                            // 👉 스탬프 사용 화면으로 이동
-                            navController.navigate("stamp/$phoneNumber")
-                        }
+                        navController.navigate("stamp/$phoneNumber")
                     }
                 }
 
