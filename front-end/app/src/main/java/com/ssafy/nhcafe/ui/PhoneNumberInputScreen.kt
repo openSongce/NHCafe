@@ -120,7 +120,7 @@ fun PhoneNumberInputScreen(
         // ️ 건너뛰기
         Button(
             onClick = { gptViewModel.sendOrder(
-                phoneNumber = "010-1234-5678",
+                phoneNumber = "01012345678",
                 0,
                 onSuccess = { orderId ->
                     navController.navigate("completeOrder/$orderId") {

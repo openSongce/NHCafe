@@ -174,7 +174,7 @@ fun StampScreen(
         Button(
             onClick = {
                 stampCount?.let { count ->
-                    gptViewModel.sendOrder(phoneNumber, 0, onSuccess = { orderId ->
+                    gptViewModel.sendOrder(phoneNumber, -1, onSuccess = { orderId ->
                         navController.navigate("completeOrder/$orderId") {
                             popUpTo("main") { inclusive = false }
                         }
