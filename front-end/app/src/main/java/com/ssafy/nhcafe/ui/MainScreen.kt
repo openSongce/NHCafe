@@ -110,12 +110,7 @@ fun RecommendedMenuSection(isKorean: Boolean, menus: List<RecommendedMenu>) {
             modifier = Modifier.fillMaxWidth()
         ) {
             menus.forEach { menu ->
-                val imageRes = when (menu.image) {
-                    "latte" -> R.drawable.temp_latte
-                    "americano" -> R.drawable.temp_americano
-                    "cappuccino" -> R.drawable.temp_cappuccino
-                    else -> R.drawable.temp_latte
-                }
+                val imageRes = getDrawableIdFromImageName(menu.image)
                 MenuCard(imageRes, menu.name, menu.description)
             }
         }
