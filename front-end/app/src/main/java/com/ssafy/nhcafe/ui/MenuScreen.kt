@@ -1,6 +1,8 @@
 package com.ssafy.nhcafe.ui
 
+import android.content.Context
 import android.util.Log
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -168,8 +170,11 @@ fun MenuGrid(
     menus: List<MenuItem>,
     gptViewModel: GPTViewModel
 ) {
+
+
     val filteredMenus = menus.filter { it.type == category }
-    var selectedItem by remember { mutableStateOf<MenuItem?>(null) }
+    var selectedItem by remember { mutableStateOf<MenuItem?>(null)
+    }
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
@@ -210,6 +215,9 @@ fun MenuGrid(
                 )
             },
             text = {
+                val context = LocalContext.current
+                val resourceName = camelToSnakeCase(item.img)
+                val imageResId = getDrawableIdByName(context, resourceName)
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -217,7 +225,7 @@ fun MenuGrid(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Image(
-                        painter = painterResource(R.drawable.temp_latte),
+                        painter = painterResource(imageResId),
                         contentDescription = item.name,
                         modifier = Modifier
                             .size(120.dp)
@@ -255,12 +263,22 @@ fun MenuGrid(
         }
     }
 }
+fun camelToSnakeCase(name: String): String {
+    return name.replace(Regex("([a-z])([A-Z])"), "$1_$2").lowercase()
+}
 
 
-
+@DrawableRes
+fun getDrawableIdByName(context: Context, name: String): Int {
+    return context.resources.getIdentifier(name, "drawable", context.packageName)
+}
 
 @Composable
 fun MenuItemCard(item: MenuItem, onItemClick: (MenuItem) -> Unit) {
+
+    val context = LocalContext.current
+    val resourceName = camelToSnakeCase(item.img)
+    val imageResId = getDrawableIdByName(context, resourceName)
     Box(
         modifier = Modifier
             .background(Color.White, RoundedCornerShape(16.dp))
@@ -274,7 +292,7 @@ fun MenuItemCard(item: MenuItem, onItemClick: (MenuItem) -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
             Image(
-                painter = painterResource(R.drawable.temp_latte),
+                painter = painterResource(id=imageResId),
                 contentDescription = item.name,
                 modifier = Modifier
                     .size(70.dp)
