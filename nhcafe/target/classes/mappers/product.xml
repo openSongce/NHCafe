@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ssafy.cafe.model.dao.ProductDao">
+
+	<select id="selectbyId" parameterType="Integer" resultType="Product">
+		select 
+			t_product.id
+			, name
+			, type
+			, price
+			, img
+		from t_product 
+		where t_product.id = #{productId}
+	</select>
+	
+	<select id="selectAll" resultType="Product">
+		select * from t_product
+	</select>
+	
+	<select id="selectWithDesc" resultType="Product">
+		select 
+			t_product.id
+			, name
+			, type
+			, price
+			, img
+			, p_desc
+		from t_product 
+		where t_product.id = #{productId}
+	</select>
+	
+	
+	<select id="selectProductByType" resultType="Product">
+	    SELECT * 
+	    FROM t_product 
+	    WHERE type = #{type}
+	</select>
+	
+</mapper>

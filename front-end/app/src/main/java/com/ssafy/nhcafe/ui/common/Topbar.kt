@@ -28,7 +28,7 @@ fun TopBar(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    painter = painterResource(id = R.drawable.logo_splash),
+                    painter = painterResource(id = R.drawable.logo_splash2),
                     contentDescription = "NHCafe Logo",
                     modifier = Modifier.size(50.dp)
                 )

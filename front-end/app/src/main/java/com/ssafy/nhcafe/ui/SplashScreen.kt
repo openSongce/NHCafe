@@ -28,11 +28,14 @@ fun SplashScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF603311)), // 진한 브라운
+
+
+            .background(Color(0xFF760C0C)),
+//            .background(Color(0xFF603311)), // 진한 브라운
         contentAlignment = Alignment.Center
     ) {
         Image(
-            painter = painterResource(id = R.drawable.logo_splash),
+            painter = painterResource(id = R.drawable.logo_splash2),
             contentDescription = "NHCafe Logo",
             modifier = Modifier.size(220.dp)
         )
