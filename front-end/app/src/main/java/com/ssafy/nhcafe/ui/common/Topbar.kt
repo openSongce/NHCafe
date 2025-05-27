@@ -3,10 +3,12 @@ package com.ssafy.nhcafe.ui.common
 import androidx.compose.ui.Alignment
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -28,9 +30,9 @@ fun TopBar(
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(
-                    painter = painterResource(id = R.drawable.logo_splash2),
+                    painter = painterResource(id = R.drawable.logo_splash3),
                     contentDescription = "NHCafe Logo",
-                    modifier = Modifier.size(50.dp)
+                    modifier = Modifier.size(60.dp).clip(CircleShape)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
             Text(

@@ -4,11 +4,11 @@
     <style name="Theme.NHCafe" parent="android:Theme.Material.Light.NoActionBar" />
 
     <style name="Theme.Smartstore_final.TransparentSplash" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowBackground">@color/redBeown</item>
-        <item name="android:statusBarColor">@color/redBeown</item>
+        <item name="android:windowBackground">@color/orangeBrown</item>
+        <item name="android:statusBarColor">@color/orangeBrown</item>
         <item name="android:windowNoTitle">true</item>
 
-        <item name="android:navigationBarColor">@color/white</item>
+        <item name="android:navigationBarColor">@color/orangeBrown</item>
         <item name="android:windowIsTranslucent">true</item>
     </style>
 </resources>
