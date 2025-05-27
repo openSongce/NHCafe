@@ -1,6 +1,7 @@
 package com.ssafy.nhcafe
 
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,6 +32,13 @@ import com.ssafy.nhcafe.viewModel.GPTViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            splashScreen.setOnExitAnimationListener { splashViewProvider ->
+                splashViewProvider.remove() // 기본 스플래시 제거
+            }
+        }
         super.onCreate(savedInstanceState)
 
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.RECORD_AUDIO)
