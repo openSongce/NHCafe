@@ -158,7 +158,9 @@ fun MenuSection(menuList: List<MenuItem>, isKorean: Boolean, moreClick : () -> U
         ) {
             randomMenus.forEach { menu ->
                 val imageId = getDrawableIdFromImageName(menu.img)
-                MenuCard(imageRes = imageId, title = menu.name, subtitle = menu.pDesc)
+                MenuCard(imageRes = imageId,
+                    title = if (isKorean) menu.name else nameEnMap[menu.name] ?: menu.name,
+                    subtitle = if (isKorean) menu.pDesc else descEnMap[menu.pDesc] ?: menu.pDesc)
             }
         }
     }
