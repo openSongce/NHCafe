@@ -146,3 +146,5 @@
 | --- | --- | --- |
 | 송진우 | **Android · AI 대화/추천 · TTS 연동 · 배포** | rkddkwl059@naver.com |
 | 홍은솔 | 백엔드(Spring) · DB  | eunsolhh@gmail.com |
+
+### [🎨 Figma](https://www.figma.com/design/6xoJptHoulOH1P9GX5RYch/nhCafe?node-id=0-1&t=hDIFRxAgKTpPpSFH-1)
