@@ -1,93 +1,148 @@
-# final_project_5
+# TEAM NHCafe
 
+### ☕ 음성인식 기반 AI 무인 카페 앱 "NHCafe"
 
+> 무인 매장·키오스크 확산 속, **디지털 약자를 위한 음성 중심 주문**  
+> **말로 주문하고, 말로 안내받는** 사용자 친화적 무인 카페
 
-## Getting started
+<br>
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+## 📑 목차
+1. [프로젝트 소개](#-프로젝트-소개)
+2. [주요 기능](#-주요-기능)
+3. [주요 화면 및 기능 소개](#-주요-화면-및-기능-소개)
+4. [생성형 AI 적용 내용 및 결과](#-생성형-ai-적용-내용-및-결과)
+5. [적용 패턴 및 구조](#-적용-패턴-및-구조)
+6. [기술 스택](#-기술-스택)
+7. [시스템 아키텍처](#%EF%B8%8F-시스템-아키텍처)
+8. [팀원 정보](#-팀원-정보)
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+<br>
 
-## Add your files
+## 📋 프로젝트 소개
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+<img src="assets/nhcafe_icon.png" height="160">
 
-```
-cd existing_repo
-git remote add origin https://lab.ssafy.com/rkddkwl059/final_project_5.git
-git branch -M master
-git push -uf origin master
-```
+**NHCafe**는 음성 인식과 TTS(Text-to-Speech)를 결합해, **버튼 터치 없이도 대화로 주문**할 수 있는 **AI 무인 카페 앱**입니다.  
+무인 매장과 키오스크의 빠른 확산이 **디지털 약자에게 높은 진입 장벽**이 되는 문제에서 출발해,  
+**사용자 친화적 음성 인터페이스**, **음성 안내/접근성 강화**, **AI 기술과 모바일 플랫폼의 융합**을 목표로 구현했습니다.
 
-## Integrate with your tools
+### 프로젝트 정보
+| 항목 | 내용 |
+| --- | --- |
+| 서비스명 | NHCafe |
+| 기획 배경 | 무인 매장/키오스크 확산 → 디지털 약자 접근성 문제 → **음성 기반 대화형 주문** 필요성 |
+| 목표 | 사용자 친화적 음성 UI, 음성 안내(TTS)로 접근성 강화, 모바일·AI 융합 |
+| 기간 | 2024.**06** ~ 2024.**06** |
+| 인원 | 2명 |
+| 역할 | **모바일(Android) + AI 적용(대화/추천/TTS)** |
 
-- [ ] [Set up project integrations](https://lab.ssafy.com/rkddkwl059/final_project_5/-/settings/integrations)
+<br>
 
-## Collaborate with your team
+## ✨ 주요 기능
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
+1. **대화형 주문(Voice-First)**  
+   - “아메리카노 톨 사이즈로 한 잔”처럼 **자연어로 메뉴 인식**  
+   - 주문 내역 **자동 구성/확인/수정** 대화 흐름 제공
 
-## Test and Deploy
+2. **음성 안내(TTS) & 접근성**  
+   - 주문 단계, 옵션 선택, 결제 전 확인을 **TTS로 음성 안내**  
+   - 시각적 UI와 **청각 안내를 동시 제공**해 가독성/접근성 강화
 
-Use the built-in continuous integration in GitLab.
+3. **추천 메뉴**  
+   - **GPT 프롬프트**로 실제 메뉴 중 **3가지 추천**  
+   - 시간대/선호/이전 주문 맥락을 반영(프롬프트 정책)
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+4. **무터치 흐름**  
+   - 앱 진입 → 음성 웨이크/시작 → 주문 → 확인 → 결제 안내까지 **버튼 없이 진행**(선택적 터치 병행)
 
-***
+5. **관리/운영(선택)**  
+   - 품절/이벤트/혼잡 안내 문구를 **대화 중 동적 반영**(백엔드 연동 시)
 
-# Editing this README
+<br>
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+## 🚀 주요 화면 및 기능 소개
 
-## Suggestions for a good README
+- **온보딩/마이크 권한**: 첫 설정, 접근성 가이드  
+- **대화형 주문 화면**: 음성 입력 → 자연어 이해(NLU) → 주문 카드 자동 구성  
+- **옵션/수정**: “샷 하나 추가해줘”, “시럽 빼줘” 같은 **자연어 수정** 지원  
+- **주문 확인 & 결제 안내**: 최종 내역 낭독(TTS), 결제 단계로 안내  
+- **추천/탐색**: “추천해줘”, “따뜻한 메뉴로 추천” 질의 대응
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+<p align="left">
+  <img src="assets/nhcafe_voice.gif" height="480" style="margin-right: 14px;">
+  <img src="assets/nhcafe_flow.gif"  height="480" style="margin-right: 14px;">
+  <img src="assets/nhcafe_tts.gif"   height="480" style="margin-right: 14px;">
+</p>
 
-## Name
-Choose a self-explaining name for your project.
+<br>
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## 🤖 생성형 AI 적용 내용 및 결과
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+### 1) 적용 모델
+- **GPT-4o (OpenAI API)**  
+- **Text Completion + TTS(Text-to-Speech)** 연동
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+### 2) 적용 기능
+- **AI 음성 대화 주문**: 사용자의 **음성 입력 → 텍스트 변환** → GPT로 의도/슬롯 해석 → 주문 구성  
+- **음성 안내(TTS)**: GPT 응답/주문 상태를 **음성으로 낭독**해 시각적·청각적 안내 동시 제공  
+- **추천 메뉴 안내**: GPT 프롬프트로 **실제 메뉴 중 3가지 추천**(시간대/취향 반영 정책)
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### 3) 결과 & 효과
+- **무터치 주문 흐름** 구현 → 키오스크 조작이 어려운 사용자도 사용 가능  
+- **TTS 안내**로 고령층/시각장애 사용자 **접근성 향상**  
+- 대화형 수정/확인으로 **오주문 감소** 및 **이탈률 저감** 기대
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+<br>
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+## 🧩 적용 패턴 및 구조
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+- **MVVM**: Jetpack Compose에 맞춘 **View(Compose) – ViewModel – Model** 분리  
+- **Repository Pattern**: `ViewModel ↔ Repository(API)` 분리로 테스트/유지보수 용이  
+- **네트워킹 레이어**: Retrofit 기반, 응답/에러 공통 처리  
+- **상태 관리**: UI 상태(State)·이벤트를 단방향 흐름으로 관리  
+- **음성 파이프라인**: **STT(음성→텍스트)** → **GPT 해석/응답** → **TTS(텍스트→음성)**
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+> STT 구현체(Android OS API/클라우드 STT 등)는 프로젝트 환경에 맞게 연결.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+<br>
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## 📚 기술 스택
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+### 📱 프론트엔드(Android)
+- **Kotlin**, **Android Studio**
+- **Jetpack Compose**
+- 아키텍처: **MVVM**, Repository
+- 네트워킹: **Retrofit / OkHttp**
+- 접근성: TTS, (필요 시) 자막/텍스트 미러링
 
-## License
-For open source projects, say how it is licensed.
+### ⚙️ 백엔드/서버
+- **Java**, **Spring Boot**
+- **MyBatis + MySQL**
+- **AWS EC2** 배포
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+### 🤖 AI
+- **GPT-4o** (OpenAI API)
+- Text Completion + **TTS** 연동
+
+<br>
+
+## 🏗️ 시스템 아키텍처
+<img src="assets/nhcafe_arch.png" width="820">
+
+- **App(Android)**  
+  └ STT(음성→텍스트) → **GPT-4o** 대화/추천 → TTS(텍스트→음성)  
+- **Backend(Spring Boot)**  
+  └ 메뉴/재고/주문 API, MyBatis + MySQL  
+- **Infra**  
+  └ AWS EC2 배포
+
+> 실제 연결 방식(직접 OpenAI 호출 vs 서버 경유)은 운영 정책에 맞게 선택.
+
+<br>
+
+## 👨‍👩‍👧‍👦 팀원 정보
+| 이름 | 역할 | 메일 |
+| --- | --- | --- |
+| 송진우 | **Android · AI 대화/추천 · TTS 연동 · 배포** | rkddkwl059@naver.com |
+| 홍은솔 | 백엔드(Spring) · DB  | eunsolhh@gmail.com |
